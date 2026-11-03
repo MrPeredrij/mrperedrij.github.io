@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Стандартная библиотека — Справочник по C</title>
+<meta name="description" content="Обзор стандартной библиотеки C: stdio.h, string.h, stdlib.h, math.h, ctype.h, time.h с примерами.">
+<link rel="preload" href="../assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="../index.html"><span class="logo">C</span> Справочник по C</a>
+<span class="std">C11 · C17</span>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Разделы">
+<p class="group">Начало</p><ul>
+<li><a href="../index.html">Главная</a></li>
+<li><a href="../getting-started/install-and-compile.html">Установка и компиляция</a></li>
+</ul>
+<p class="group">Основы</p><ul>
+<li><a href="../basics/syntax.html">Синтаксис и операторы</a></li>
+<li><a href="../basics/types-and-variables.html">Типы и переменные</a></li>
+<li><a href="../basics/control-flow.html">Управление потоком</a></li>
+</ul>
+<p class="group">Язык</p><ul>
+<li><a href="../language/functions.html">Функции</a></li>
+<li><a href="../language/arrays-and-strings.html">Массивы и строки</a></li>
+<li><a href="../language/pointers.html">Указатели</a></li>
+<li><a href="../language/memory.html">Память</a></li>
+<li><a href="../language/structs-unions-enums.html">Структуры и enum</a></li>
+<li><a href="../language/preprocessor.html">Препроцессор</a></li>
+</ul>
+<p class="group">Библиотека</p><ul>
+<li><a href="../library/stdlib.html" class="active" aria-current="page">Стандартная библиотека</a></li>
+<li><a href="../library/file-io.html">Работа с файлами</a></li>
+</ul>
+<p class="group">Практика</p><ul>
+<li><a href="../examples/index.html">Примеры программ</a></li>
+<li><a href="../faq.html">FAQ и глоссарий</a></li>
+</ul>
+</nav>
+<main>
+<h1>Стандартная библиотека</h1>
+<table>
+<thead><tr><th>Заголовок</th><th>Содержимое</th></tr></thead>
+<tbody>
+<tr><td><code>&lt;stdio.h&gt;</code></td><td>ввод-вывод: <code>printf</code>, <code>scanf</code>, <code>fgets</code>, файлы</td></tr>
+<tr><td><code>&lt;stdlib.h&gt;</code></td><td>память, преобразование строк в числа, <code>qsort</code>, <code>bsearch</code>, <code>rand</code>, <code>exit</code></td></tr>
+<tr><td><code>&lt;string.h&gt;</code></td><td>строки и блоки памяти: <code>strlen</code>, <code>strcmp</code>, <code>memcpy</code>, <code>memset</code></td></tr>
+<tr><td><code>&lt;math.h&gt;</code></td><td>математика: <code>sqrt</code>, <code>pow</code>, <code>sin</code>, <code>floor</code> (в Linux нужен <code>-lm</code>)</td></tr>
+<tr><td><code>&lt;ctype.h&gt;</code></td><td>классификация символов: <code>isdigit</code>, <code>isalpha</code>, <code>toupper</code></td></tr>
+<tr><td><code>&lt;time.h&gt;</code></td><td>время: <code>time</code>, <code>clock</code>, <code>strftime</code></td></tr>
+<tr><td><code>&lt;errno.h&gt;</code></td><td>код последней ошибки <code>errno</code></td></tr>
+<tr><td><code>&lt;assert.h&gt;</code></td><td>макрос <code>assert</code></td></tr>
+<tr><td><code>&lt;stdint.h&gt;</code>, <code>&lt;inttypes.h&gt;</code></td><td>целые фиксированной ширины и их форматы</td></tr>
+<tr><td><code>&lt;threads.h&gt;</code>, <code>&lt;stdatomic.h&gt;</code></td><td>потоки и атомарные операции (C11, поддержка необязательна)</td></tr>
+</tbody>
+</table>
+
+<h2>stdio.h: форматированный вывод</h2>
+<table>
+<thead><tr><th>Спецификатор</th><th>Тип</th><th>Пример</th></tr></thead>
+<tbody>
+<tr><td><code>%d</code>, <code>%i</code></td><td><code>int</code></td><td><code>printf("%5d", 42)</code> → <code>&nbsp;&nbsp;&nbsp;42</code></td></tr>
+<tr><td><code>%u</code>, <code>%x</code>, <code>%o</code></td><td><code>unsigned</code></td><td><code>printf("%#x", 255u)</code> → <code>0xff</code></td></tr>
+<tr><td><code>%f</code>, <code>%e</code>, <code>%g</code></td><td><code>double</code></td><td><code>printf("%.3f", 3.14159)</code> → <code>3.142</code></td></tr>
+<tr><td><code>%c</code>, <code>%s</code></td><td>символ, строка</td><td><code>printf("%-6s|", "ab")</code> → <code>ab&nbsp;&nbsp;&nbsp;&nbsp;|</code></td></tr>
+<tr><td><code>%p</code></td><td><code>void *</code></td><td>адрес</td></tr>
+<tr><td><code>%zu</code>, <code>%td</code></td><td><code>size_t</code>, <code>ptrdiff_t</code></td><td><code>printf("%zu", sizeof(int))</code></td></tr>
+<tr><td><code>%%</code></td><td>—</td><td>знак процента</td></tr>
+</tbody>
+</table>
+
+<h2>stdio.h: безопасный ввод</h2>
+<p><code>scanf</code> плохо обрабатывает ошибочный ввод. Надёжнее читать строку целиком через <code>fgets</code>
+и разбирать её функцией <code>strtol</code>, которая сообщает об ошибках.</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;ctype.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;limits.h&gt;
+
+/* возвращает 1 при успехе, 0 при ошибке или конце ввода */
+static int read_int(const char *prompt, int *out)
+{
+    char line[64];
+    printf("%s", prompt);
+    fflush(stdout);
+    if (fgets(line, sizeof line, stdin) == NULL)
+        return 0;
+
+    errno = 0;
+    char *end;
+    long v = strtol(line, &amp;end, 10);
+    if (end == line || errno == ERANGE || v &lt; INT_MIN || v &gt; INT_MAX)
+        return 0;
+    while (isspace((unsigned char)*end))
+        end++;
+    if (*end != '\0')
+        return 0;
+    *out = (int)v;
+    return 1;
+}
+
+int main(void)
+{
+    int n;
+    if (read_int("Введите целое число: ", &amp;n))
+        printf("Вы ввели %d, его квадрат %lld\n", n, (long long)n * n);
+    else
+        puts("Это не целое число");
+    return 0;
+}</code></pre></figure>
+<h2>string.h</h2>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+int main(void)
+{
+    char dst[16];
+    const char *src = "библиотека";        /* 20 байт в UTF-8 */
+
+    size_t len = strlen(src);
+    if (len &lt; sizeof dst) {
+        memcpy(dst, src, len + 1);
+    } else {
+        /* усечение; на границе может разрезаться многобайтовый символ */
+        memcpy(dst, "library", 8);
+    }
+    printf("len = %zu, dst = \"%s\"\n", len, dst);
+
+    const char *path = "/usr/include/stdio.h";
+    const char *slash = strrchr(path, '/');
+    printf("файл: %s\n", slash ? slash + 1 : path);
+
+    printf("strcmp(\"abc\", \"abd\") %s 0\n", strcmp("abc", "abd") &lt; 0 ? "&lt;" : "&gt;=");
+
+    int src_arr[4] = { 1, 2, 3, 4 }, dst_arr[4];
+    memmove(dst_arr, src_arr, sizeof src_arr);   /* безопасно и при перекрытии */
+    memset(src_arr, 0, sizeof src_arr);
+    printf("dst_arr[3] = %d, src_arr[3] = %d\n", dst_arr[3], src_arr[3]);
+    return 0;
+}</code></pre></figure>
+<h2>stdlib.h: сортировка, поиск, случайные числа</h2>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;time.h&gt;
+
+static int cmp_int(const void *a, const void *b)
+{
+    int x = *(const int *)a, y = *(const int *)b;
+    return (x &gt; y) - (x &lt; y);
+}
+
+int main(void)
+{
+    srand((unsigned)time(NULL));
+    int v[10];
+    for (int i = 0; i &lt; 10; i++)
+        v[i] = rand() % 100;
+
+    qsort(v, 10, sizeof v[0], cmp_int);
+    for (int i = 0; i &lt; 10; i++)
+        printf("%d ", v[i]);
+    putchar('\n');
+
+    int key = v[3];
+    int *found = bsearch(&amp;key, v, 10, sizeof v[0], cmp_int);
+    printf("bsearch(%d): %s\n", key, found ? "найдено" : "нет");
+
+    div_t d = div(17, 5);
+    printf("atoi(\"123\") = %d, strtod = %.2f\n", atoi("123"), strtod("2.5e1", NULL));
+    printf("abs(-9) = %d, div(17, 5) = { %d, %d }\n", abs(-9), d.quot, d.rem);
+    return 0;
+}</code></pre></figure>
+<h2>math.h</h2>
+<p>При сборке с GCC в Linux подключайте библиотеку: <code>gcc main.c -lm</code>.</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;math.h&gt;
+
+int main(void)
+{
+    const double pi = acos(-1.0);
+    printf("sqrt(2)   = %.6f\n", sqrt(2.0));
+    printf("pow(2,10) = %.0f\n", pow(2.0, 10.0));
+    printf("sin(pi/6) = %.3f\n", sin(pi / 6));
+    printf("hypot     = %.1f\n", hypot(3.0, 4.0));
+    printf("floor/ceil/round(-2.5) = %.0f %.0f %.0f\n", floor(-2.5), ceil(-2.5), round(-2.5));
+    printf("log(e) = %.1f, log10(1000) = %.1f\n", log(exp(1.0)), log10(1000.0));
+    printf("isnan(NAN) = %d\n", isnan(NAN) != 0);
+    return 0;
+}</code></pre></figure>
+<h2>time.h</h2>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;time.h&gt;
+
+int main(void)
+{
+    time_t now = time(NULL);
+    struct tm *local = localtime(&amp;now);
+    char buf[64];
+    if (local != NULL &amp;&amp; strftime(buf, sizeof buf, "%d.%m.%Y %H:%M:%S", local) &gt; 0)
+        printf("сейчас: %s\n", buf);
+
+    clock_t start = clock();
+    double acc = 0;
+    for (long i = 0; i &lt; 10000000L; i++)
+        acc += 1.0 / (double)(i + 1);
+    double sec = (double)(clock() - start) / CLOCKS_PER_SEC;
+    printf("сумма = %.4f, процессорное время %.3f с\n", acc, sec);
+    return 0;
+}</code></pre></figure>
+<div class="note">Функции <code>localtime</code>, <code>strtok</code> и <code>rand</code> используют внутреннее
+состояние и не потокобезопасны. В POSIX есть варианты <code>localtime_r</code> и <code>strtok_r</code>.</div>
+<nav class="pager" aria-label="Соседние страницы"><a class="prev" href="../language/preprocessor.html">← Препроцессор</a><a class="next" href="../library/file-io.html">Работа с файлами →</a></nav>
+</main>
+</div>
+<footer class="footer">
+<p>Справочник по языку C — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+Подсветка: <a href="../assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="../assets/fonts/OFL.txt">OFL 1.1</a>).</p>
+</footer>
+<script src="../assets/js/prism.js"></script>
+</body>
+</html>

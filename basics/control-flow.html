@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Управление потоком выполнения — Справочник по C</title>
+<meta name="description" content="Условия if/else, switch, циклы for, while, do-while, break, continue и goto в языке C.">
+<link rel="preload" href="../assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="../index.html"><span class="logo">C</span> Справочник по C</a>
+<span class="std">C11 · C17</span>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Разделы">
+<p class="group">Начало</p><ul>
+<li><a href="../index.html">Главная</a></li>
+<li><a href="../getting-started/install-and-compile.html">Установка и компиляция</a></li>
+</ul>
+<p class="group">Основы</p><ul>
+<li><a href="../basics/syntax.html">Синтаксис и операторы</a></li>
+<li><a href="../basics/types-and-variables.html">Типы и переменные</a></li>
+<li><a href="../basics/control-flow.html" class="active" aria-current="page">Управление потоком</a></li>
+</ul>
+<p class="group">Язык</p><ul>
+<li><a href="../language/functions.html">Функции</a></li>
+<li><a href="../language/arrays-and-strings.html">Массивы и строки</a></li>
+<li><a href="../language/pointers.html">Указатели</a></li>
+<li><a href="../language/memory.html">Память</a></li>
+<li><a href="../language/structs-unions-enums.html">Структуры и enum</a></li>
+<li><a href="../language/preprocessor.html">Препроцессор</a></li>
+</ul>
+<p class="group">Библиотека</p><ul>
+<li><a href="../library/stdlib.html">Стандартная библиотека</a></li>
+<li><a href="../library/file-io.html">Работа с файлами</a></li>
+</ul>
+<p class="group">Практика</p><ul>
+<li><a href="../examples/index.html">Примеры программ</a></li>
+<li><a href="../faq.html">FAQ и глоссарий</a></li>
+</ul>
+</nav>
+<main>
+<h1>Управление потоком выполнения</h1>
+<h2>if и else</h2>
+<p>Условие — любое скалярное выражение: ноль означает «ложь», всё остальное — «истину».</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+static const char *grade(int score)
+{
+    if (score &gt;= 90)
+        return "отлично";
+    else if (score &gt;= 75)
+        return "хорошо";
+    else if (score &gt;= 60)
+        return "удовлетворительно";
+    else
+        return "неудовлетворительно";
+}
+
+int main(void)
+{
+    int scores[] = { 95, 80, 61, 12 };
+    for (int i = 0; i &lt; 4; i++)
+        printf("%d: %s\n", scores[i], grade(scores[i]));
+    return 0;
+}</code></pre></figure>
+<h2>switch</h2>
+<p>Метки <code>case</code> должны быть целочисленными константными выражениями. Без <code>break</code>
+выполнение «проваливается» в следующую ветку.</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main(void)
+{
+    const char *ops = "+-*/?";
+    int a = 12, b = 4;
+
+    for (const char *p = ops; *p != '\0'; p++) {
+        switch (*p) {
+        case '+': printf("%d\n", a + b); break;
+        case '-': printf("%d\n", a - b); break;
+        case '*': printf("%d\n", a * b); break;
+        case '/':
+            if (b != 0)
+                printf("%d\n", a / b);
+            break;
+        default:
+            printf("неизвестная операция '%c'\n", *p);
+            break;
+        }
+    }
+    return 0;
+}</code></pre></figure>
+<h2>Циклы</h2>
+<table>
+<thead><tr><th>Цикл</th><th>Когда проверяется условие</th></tr></thead>
+<tbody>
+<tr><td><code>while (усл) тело</code></td><td>перед каждой итерацией</td></tr>
+<tr><td><code>do тело while (усл);</code></td><td>после итерации — тело выполнится хотя бы раз</td></tr>
+<tr><td><code>for (иниц; усл; шаг) тело</code></td><td>перед каждой итерацией; переменная из <code>иниц</code> видна только в цикле (C99)</td></tr>
+</tbody>
+</table>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main(void)
+{
+    /* for: сумма чисел 1..100 */
+    int sum = 0;
+    for (int i = 1; i &lt;= 100; i++)
+        sum += i;
+    printf("sum = %d\n", sum);
+
+    /* while: количество цифр числа */
+    unsigned long long n = 9876543210ULL;
+    int digits = 0;
+    while (n &gt; 0) {
+        n /= 10;
+        digits++;
+    }
+    printf("digits = %d\n", digits);
+
+    /* do-while: выполнится хотя бы один раз */
+    int k = 0;
+    do {
+        printf("k = %d\n", k);
+        k++;
+    } while (k &lt; 0);
+
+    /* break и continue */
+    for (int i = 0; i &lt; 10; i++) {
+        if (i % 2 == 0)
+            continue;       /* пропустить чётные */
+        if (i &gt; 7)
+            break;          /* выйти из цикла */
+        printf("%d ", i);
+    }
+    putchar('\n');
+    return 0;
+}</code></pre></figure>
+<h2>goto</h2>
+<p><code>goto</code> редко нужен, но в C это признанный способ централизованно освобождать ресурсы при ошибках:</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+static int process(size_t n)
+{
+    int rc = -1;
+    int *b = NULL;
+    int *a = malloc(n * sizeof *a);
+    if (a == NULL)
+        goto out;
+    b = malloc(n * sizeof *b);
+    if (b == NULL)
+        goto out;
+
+    for (size_t i = 0; i &lt; n; i++) {
+        a[i] = (int)i;
+        b[i] = a[i] * a[i];
+    }
+    printf("b[n-1] = %d\n", b[n - 1]);
+    rc = 0;
+
+out:
+    free(b);    /* free(NULL) ничего не делает */
+    free(a);
+    return rc;
+}
+
+int main(void)
+{
+    return process(10) == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
+}</code></pre></figure>
+<div class="note">Частая ошибка — <code>if (x = 5)</code> вместо <code>if (x == 5)</code>. Флаг <code>-Wall</code>
+предупреждает о таком присваивании в условии.</div>
+<nav class="pager" aria-label="Соседние страницы"><a class="prev" href="../basics/types-and-variables.html">← Типы и переменные</a><a class="next" href="../language/functions.html">Функции →</a></nav>
+</main>
+</div>
+<footer class="footer">
+<p>Справочник по языку C — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+Подсветка: <a href="../assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="../assets/fonts/OFL.txt">OFL 1.1</a>).</p>
+</footer>
+<script src="../assets/js/prism.js"></script>
+</body>
+</html>

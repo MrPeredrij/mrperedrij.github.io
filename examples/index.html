@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Примеры программ — Справочник по C</title>
+<meta name="description" content="Законченные программы на C: решето Эратосфена, калькулятор выражений, частотный словарь, игра «Жизнь», бинарное дерево, стек.">
+<link rel="preload" href="../assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="../index.html"><span class="logo">C</span> Справочник по C</a>
+<span class="std">C11 · C17</span>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Разделы">
+<p class="group">Начало</p><ul>
+<li><a href="../index.html">Главная</a></li>
+<li><a href="../getting-started/install-and-compile.html">Установка и компиляция</a></li>
+</ul>
+<p class="group">Основы</p><ul>
+<li><a href="../basics/syntax.html">Синтаксис и операторы</a></li>
+<li><a href="../basics/types-and-variables.html">Типы и переменные</a></li>
+<li><a href="../basics/control-flow.html">Управление потоком</a></li>
+</ul>
+<p class="group">Язык</p><ul>
+<li><a href="../language/functions.html">Функции</a></li>
+<li><a href="../language/arrays-and-strings.html">Массивы и строки</a></li>
+<li><a href="../language/pointers.html">Указатели</a></li>
+<li><a href="../language/memory.html">Память</a></li>
+<li><a href="../language/structs-unions-enums.html">Структуры и enum</a></li>
+<li><a href="../language/preprocessor.html">Препроцессор</a></li>
+</ul>
+<p class="group">Библиотека</p><ul>
+<li><a href="../library/stdlib.html">Стандартная библиотека</a></li>
+<li><a href="../library/file-io.html">Работа с файлами</a></li>
+</ul>
+<p class="group">Практика</p><ul>
+<li><a href="../examples/index.html" class="active" aria-current="page">Примеры программ</a></li>
+<li><a href="../faq.html">FAQ и глоссарий</a></li>
+</ul>
+</nav>
+<main>
+<h1>Примеры программ</h1>
+<p>Каждая программа на этой странице — законченный файл. Сохраните её, например, как <code>main.c</code> и
+соберите командой <code>gcc -std=c17 -Wall -Wextra -O2 main.c -o main</code>.</p>
+<nav class="toc" aria-label="Содержание страницы">
+<a href="#sieve">Решето Эратосфена</a>
+<a href="#calc">Калькулятор выражений</a>
+<a href="#freq">Частотный словарь</a>
+<a href="#life">Игра «Жизнь»</a>
+<a href="#bst">Бинарное дерево поиска</a>
+<a href="#stack">Проверка скобок</a>
+</nav>
+
+<h2 id="sieve">Решето Эратосфена</h2>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdbool.h&gt;
+
+int main(int argc, char *argv[])
+{
+    long limit = argc &gt; 1 ? strtol(argv[1], NULL, 10) : 100;
+    if (limit &lt; 2)
+        return 0;
+
+    bool *composite = calloc((size_t)limit + 1, sizeof *composite);
+    if (composite == NULL)
+        return EXIT_FAILURE;
+
+    for (long i = 2; i * i &lt;= limit; i++)
+        if (!composite[i])
+            for (long j = i * i; j &lt;= limit; j += i)
+                composite[j] = true;
+
+    long count = 0;
+    for (long i = 2; i &lt;= limit; i++)
+        if (!composite[i]) {
+            printf("%ld ", i);
+            count++;
+        }
+    printf("\nпростых чисел до %ld: %ld\n", limit, count);
+    free(composite);
+    return EXIT_SUCCESS;
+}</code></pre></figure>
+<h2 id="calc">Калькулятор выражений (рекурсивный спуск)</h2>
+<p>Разбирает выражения с <code>+ - * /</code>, скобками и унарным минусом по грамматике
+<code>expr = term {(+|-) term}</code>, <code>term = factor {(*|/) factor}</code>.</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;ctype.h&gt;
+
+static const char *pos;
+static int error;
+
+static double expr(void);
+
+static void skip_spaces(void)
+{
+    while (isspace((unsigned char)*pos))
+        pos++;
+}
+
+static double factor(void)
+{
+    skip_spaces();
+    if (*pos == '-') {
+        pos++;
+        return -factor();
+    }
+    if (*pos == '(') {
+        pos++;
+        double v = expr();
+        skip_spaces();
+        if (*pos == ')')
+            pos++;
+        else
+            error = 1;
+        return v;
+    }
+    char *end;
+    double v = strtod(pos, &amp;end);
+    if (end == pos)
+        error = 1;
+    pos = end;
+    return v;
+}
+
+static double term(void)
+{
+    double v = factor();
+    for (;;) {
+        skip_spaces();
+        if (*pos == '*') { pos++; v *= factor(); }
+        else if (*pos == '/') { pos++; v /= factor(); }
+        else return v;
+    }
+}
+
+static double expr(void)
+{
+    double v = term();
+    for (;;) {
+        skip_spaces();
+        if (*pos == '+') { pos++; v += term(); }
+        else if (*pos == '-') { pos++; v -= term(); }
+        else return v;
+    }
+}
+
+int main(void)
+{
+    const char *tests[] = { "2 + 3 * 4", "(2 + 3) * 4", "-(1.5 + 2.5) / 2", "10 / (5 - 3", "7 *" };
+    for (size_t i = 0; i &lt; sizeof tests / sizeof tests[0]; i++) {
+        pos = tests[i];
+        error = 0;
+        double v = expr();
+        skip_spaces();
+        if (error || *pos != '\0')
+            printf("%-20s =&gt; ошибка синтаксиса\n", tests[i]);
+        else
+            printf("%-20s =&gt; %g\n", tests[i], v);
+    }
+    return 0;
+}</code></pre></figure>
+<h2 id="freq">Частотный словарь (хеш-таблица)</h2>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;ctype.h&gt;
+
+#define TABLE_SIZE 1024
+
+typedef struct entry {
+    char         *word;
+    int           count;
+    struct entry *next;
+} Entry;
+
+static Entry *table[TABLE_SIZE];
+
+static unsigned long hash(const char *s)          /* djb2 */
+{
+    unsigned long h = 5381;
+    for (; *s; s++)
+        h = h * 33 + (unsigned char)*s;
+    return h % TABLE_SIZE;
+}
+
+static int add_word(const char *w)
+{
+    unsigned long h = hash(w);
+    for (Entry *e = table[h]; e != NULL; e = e-&gt;next)
+        if (strcmp(e-&gt;word, w) == 0) {
+            e-&gt;count++;
+            return 0;
+        }
+    Entry *e = malloc(sizeof *e);
+    if (e == NULL)
+        return -1;
+    size_t len = strlen(w) + 1;
+    e-&gt;word = malloc(len);
+    if (e-&gt;word == NULL) {
+        free(e);
+        return -1;
+    }
+    memcpy(e-&gt;word, w, len);
+    e-&gt;count = 1;
+    e-&gt;next = table[h];
+    table[h] = e;
+    return 0;
+}
+
+int main(void)
+{
+    const char *text =
+        "the quick brown fox jumps over the lazy dog the dog sleeps "
+        "and the fox runs over the hill";
+    char word[64];
+    size_t n = 0;
+
+    for (const char *p = text;; p++) {
+        if (isalpha((unsigned char)*p) &amp;&amp; n &lt; sizeof word - 1) {
+            word[n++] = (char)tolower((unsigned char)*p);
+        } else {
+            if (n &gt; 0) {
+                word[n] = '\0';
+                if (add_word(word) != 0)
+                    return EXIT_FAILURE;
+                n = 0;
+            }
+            if (*p == '\0')
+                break;
+        }
+    }
+
+    for (size_t i = 0; i &lt; TABLE_SIZE; i++)
+        for (Entry *e = table[i]; e != NULL;) {
+            if (e-&gt;count &gt; 1)
+                printf("%-6s %d\n", e-&gt;word, e-&gt;count);
+            Entry *next = e-&gt;next;
+            free(e-&gt;word);
+            free(e);
+            e = next;
+        }
+    return EXIT_SUCCESS;
+}</code></pre></figure>
+<h2 id="life">Игра «Жизнь» Конвея</h2>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+#define W 20
+#define H 10
+
+static int count_neighbors(unsigned char g[H][W], int r, int c)
+{
+    int n = 0;
+    for (int dr = -1; dr &lt;= 1; dr++)
+        for (int dc = -1; dc &lt;= 1; dc++) {
+            if (dr == 0 &amp;&amp; dc == 0)
+                continue;
+            int rr = (r + dr + H) % H, cc = (c + dc + W) % W;   /* поле-тор */
+            n += g[rr][cc];
+        }
+    return n;
+}
+
+static void step(unsigned char g[H][W])
+{
+    unsigned char next[H][W];
+    for (int r = 0; r &lt; H; r++)
+        for (int c = 0; c &lt; W; c++) {
+            int n = count_neighbors(g, r, c);
+            next[r][c] = (unsigned char)(n == 3 || (g[r][c] &amp;&amp; n == 2));
+        }
+    memcpy(g, next, sizeof next);
+}
+
+static void print(unsigned char g[H][W], int gen)
+{
+    printf("Поколение %d\n", gen);
+    for (int r = 0; r &lt; H; r++) {
+        for (int c = 0; c &lt; W; c++)
+            putchar(g[r][c] ? '#' : '.');
+        putchar('\n');
+    }
+}
+
+int main(void)
+{
+    unsigned char grid[H][W] = { { 0 } };
+    /* глайдер */
+    grid[1][2] = grid[2][3] = grid[3][1] = grid[3][2] = grid[3][3] = 1;
+
+    for (int gen = 0; gen &lt; 4; gen++) {
+        print(grid, gen);
+        step(grid);
+    }
+    return 0;
+}</code></pre></figure>
+<h2 id="bst">Бинарное дерево поиска</h2>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+typedef struct tree {
+    int          key;
+    struct tree *left, *right;
+} Tree;
+
+static Tree *insert(Tree *t, int key)
+{
+    if (t == NULL) {
+        t = malloc(sizeof *t);
+        if (t != NULL) {
+            t-&gt;key = key;
+            t-&gt;left = t-&gt;right = NULL;
+        }
+        return t;
+    }
+    if (key &lt; t-&gt;key)
+        t-&gt;left = insert(t-&gt;left, key);
+    else if (key &gt; t-&gt;key)
+        t-&gt;right = insert(t-&gt;right, key);
+    return t;
+}
+
+static const Tree *find(const Tree *t, int key)
+{
+    while (t != NULL &amp;&amp; t-&gt;key != key)
+        t = key &lt; t-&gt;key ? t-&gt;left : t-&gt;right;
+    return t;
+}
+
+static void in_order(const Tree *t)
+{
+    if (t == NULL)
+        return;
+    in_order(t-&gt;left);
+    printf("%d ", t-&gt;key);
+    in_order(t-&gt;right);
+}
+
+static int height(const Tree *t)
+{
+    if (t == NULL)
+        return 0;
+    int l = height(t-&gt;left), r = height(t-&gt;right);
+    return 1 + (l &gt; r ? l : r);
+}
+
+static void destroy(Tree *t)
+{
+    if (t == NULL)
+        return;
+    destroy(t-&gt;left);
+    destroy(t-&gt;right);
+    free(t);
+}
+
+int main(void)
+{
+    int keys[] = { 50, 30, 70, 20, 40, 60, 80, 35 };
+    Tree *root = NULL;
+    for (size_t i = 0; i &lt; sizeof keys / sizeof keys[0]; i++)
+        root = insert(root, keys[i]);
+
+    in_order(root);
+    printf("\nвысота = %d, 35 %s, 65 %s\n", height(root),
+           find(root, 35) ? "найден" : "не найден",
+           find(root, 65) ? "найден" : "не найден");
+    destroy(root);
+    return 0;
+}</code></pre></figure>
+<h2 id="stack">Стек на массиве и проверка скобок</h2>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdbool.h&gt;
+
+#define STACK_MAX 128
+
+typedef struct {
+    char items[STACK_MAX];
+    int  top;
+} Stack;
+
+static bool push(Stack *s, char c)
+{
+    if (s-&gt;top == STACK_MAX)
+        return false;
+    s-&gt;items[s-&gt;top++] = c;
+    return true;
+}
+
+static bool pop(Stack *s, char *out)
+{
+    if (s-&gt;top == 0)
+        return false;
+    *out = s-&gt;items[--s-&gt;top];
+    return true;
+}
+
+static bool balanced(const char *text)
+{
+    Stack s = { .top = 0 };
+    for (const char *p = text; *p; p++) {
+        char open;
+        switch (*p) {
+        case '(': case '[': case '{':
+            if (!push(&amp;s, *p))
+                return false;
+            break;
+        case ')': if (!pop(&amp;s, &amp;open) || open != '(') return false; break;
+        case ']': if (!pop(&amp;s, &amp;open) || open != '[') return false; break;
+        case '}': if (!pop(&amp;s, &amp;open) || open != '{') return false; break;
+        default: break;
+        }
+    }
+    return s.top == 0;
+}
+
+int main(void)
+{
+    const char *samples[] = { "a[i] = f(x, {1, 2});", "if (a[0) {}", "((()))", "{[}]" };
+    for (int i = 0; i &lt; 4; i++)
+        printf("%-24s %s\n", samples[i], balanced(samples[i]) ? "OK" : "ошибка");
+    return 0;
+}</code></pre></figure>
+<nav class="pager" aria-label="Соседние страницы"><a class="prev" href="../library/file-io.html">← Работа с файлами</a><a class="next" href="../faq.html">FAQ и глоссарий →</a></nav>
+</main>
+</div>
+<footer class="footer">
+<p>Справочник по языку C — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+Подсветка: <a href="../assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="../assets/fonts/OFL.txt">OFL 1.1</a>).</p>
+</footer>
+<script src="../assets/js/prism.js"></script>
+</body>
+</html>

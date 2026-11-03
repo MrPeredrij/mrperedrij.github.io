@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Работа с файлами — Справочник по C</title>
+<meta name="description" content="Файловый ввод-вывод в C: fopen, fclose, fprintf, fgets, fread, fwrite, fseek и обработка ошибок.">
+<link rel="preload" href="../assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="../index.html"><span class="logo">C</span> Справочник по C</a>
+<span class="std">C11 · C17</span>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Разделы">
+<p class="group">Начало</p><ul>
+<li><a href="../index.html">Главная</a></li>
+<li><a href="../getting-started/install-and-compile.html">Установка и компиляция</a></li>
+</ul>
+<p class="group">Основы</p><ul>
+<li><a href="../basics/syntax.html">Синтаксис и операторы</a></li>
+<li><a href="../basics/types-and-variables.html">Типы и переменные</a></li>
+<li><a href="../basics/control-flow.html">Управление потоком</a></li>
+</ul>
+<p class="group">Язык</p><ul>
+<li><a href="../language/functions.html">Функции</a></li>
+<li><a href="../language/arrays-and-strings.html">Массивы и строки</a></li>
+<li><a href="../language/pointers.html">Указатели</a></li>
+<li><a href="../language/memory.html">Память</a></li>
+<li><a href="../language/structs-unions-enums.html">Структуры и enum</a></li>
+<li><a href="../language/preprocessor.html">Препроцессор</a></li>
+</ul>
+<p class="group">Библиотека</p><ul>
+<li><a href="../library/stdlib.html">Стандартная библиотека</a></li>
+<li><a href="../library/file-io.html" class="active" aria-current="page">Работа с файлами</a></li>
+</ul>
+<p class="group">Практика</p><ul>
+<li><a href="../examples/index.html">Примеры программ</a></li>
+<li><a href="../faq.html">FAQ и глоссарий</a></li>
+</ul>
+</nav>
+<main>
+<h1>Работа с файлами</h1>
+<p>Файл открывается функцией <code>fopen</code>, которая возвращает указатель на <code>FILE</code> или
+<code>NULL</code> при ошибке. Стандартные потоки <code>stdin</code>, <code>stdout</code> и <code>stderr</code>
+открыты автоматически.</p>
+
+<table>
+<thead><tr><th>Режим</th><th>Описание</th></tr></thead>
+<tbody>
+<tr><td><code>"r"</code></td><td>чтение; файл должен существовать</td></tr>
+<tr><td><code>"w"</code></td><td>запись; файл создаётся или обрезается до нуля</td></tr>
+<tr><td><code>"a"</code></td><td>дозапись в конец</td></tr>
+<tr><td><code>"r+"</code>, <code>"w+"</code>, <code>"a+"</code></td><td>чтение и запись</td></tr>
+<tr><td><code>"wx"</code></td><td>создать новый файл, ошибка если он уже есть (C11)</td></tr>
+<tr><td>суффикс <code>b</code></td><td>двоичный режим (важно в Windows: <code>"rb"</code>, <code>"wb"</code>)</td></tr>
+</tbody>
+</table>
+
+<h2>Текстовые файлы</h2>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+int main(void)
+{
+    const char *path = "notes.txt";
+
+    FILE *out = fopen(path, "w");
+    if (out == NULL) {
+        perror(path);
+        return EXIT_FAILURE;
+    }
+    for (int i = 1; i &lt;= 3; i++)
+        fprintf(out, "строка %d\n", i);
+    if (fclose(out) != 0) {             /* ошибки записи часто видны только здесь */
+        perror("fclose");
+        return EXIT_FAILURE;
+    }
+
+    FILE *in = fopen(path, "r");
+    if (in == NULL) {
+        perror(path);
+        return EXIT_FAILURE;
+    }
+    char line[128];
+    int n = 0;
+    while (fgets(line, sizeof line, in) != NULL)
+        printf("%d: %s", ++n, line);
+    if (ferror(in))
+        perror("чтение");
+    fclose(in);
+    remove(path);
+    return EXIT_SUCCESS;
+}</code></pre></figure>
+<h2>Двоичные файлы: fwrite и fread</h2>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+typedef struct {
+    int    id;
+    double temperature;
+} Sample;
+
+int main(void)
+{
+    const char *path = "samples.bin";
+    Sample data[3] = { { 1, 20.5 }, { 2, 21.0 }, { 3, 19.75 } };
+
+    FILE *f = fopen(path, "wb");
+    if (f == NULL) {
+        perror(path);
+        return EXIT_FAILURE;
+    }
+    size_t written = fwrite(data, sizeof data[0], 3, f);
+    if (fclose(f) != 0 || written != 3)
+        return EXIT_FAILURE;
+
+    f = fopen(path, "rb");
+    if (f == NULL) {
+        perror(path);
+        return EXIT_FAILURE;
+    }
+    /* узнать размер файла */
+    if (fseek(f, 0, SEEK_END) == 0) {
+        long size = ftell(f);
+        printf("размер файла: %ld байт, записей: %ld\n", size, size / (long)sizeof(Sample));
+    }
+    rewind(f);
+
+    Sample s;
+    while (fread(&amp;s, sizeof s, 1, f) == 1)
+        printf("#%d: %.2f °C\n", s.id, s.temperature);
+    fclose(f);
+    remove(path);
+    return EXIT_SUCCESS;
+}</code></pre></figure>
+<div class="warn">Двоичный формат, записанный <code>fwrite</code> из структуры, зависит от платформы:
+от порядка байтов, размера типов и выравнивания. Для обмена между разными системами используйте текстовый
+формат или явную сериализацию по байтам.</div>
+
+<h2>Посимвольная обработка: подсчёт строк, слов и байтов</h2>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;ctype.h&gt;
+
+/* упрощённый аналог утилиты wc: читает stdin или файл из argv[1] */
+int main(int argc, char *argv[])
+{
+    FILE *in = stdin;
+    if (argc &gt; 1) {
+        in = fopen(argv[1], "r");
+        if (in == NULL) {
+            perror(argv[1]);
+            return 1;
+        }
+    }
+
+    long lines = 0, words = 0, bytes = 0;
+    int in_word = 0, ch;
+    while ((ch = fgetc(in)) != EOF) {    /* ch имеет тип int, чтобы отличить EOF */
+        bytes++;
+        if (ch == '\n')
+            lines++;
+        if (isspace(ch)) {
+            in_word = 0;
+        } else if (!in_word) {
+            in_word = 1;
+            words++;
+        }
+    }
+    printf("%ld %ld %ld\n", lines, words, bytes);
+    if (in != stdin)
+        fclose(in);
+    return 0;
+}</code></pre></figure>
+<h2>Обработка ошибок</h2>
+<ul>
+<li><code>perror(msg)</code> печатает <code>msg</code> и описание текущего <code>errno</code> в <code>stderr</code>;</li>
+<li><code>strerror(errno)</code> возвращает текст ошибки;</li>
+<li><code>feof(f)</code> и <code>ferror(f)</code> позволяют отличить конец файла от ошибки чтения;</li>
+<li><code>fflush(f)</code> принудительно записывает буфер потока.</li>
+</ul>
+<nav class="pager" aria-label="Соседние страницы"><a class="prev" href="../library/stdlib.html">← Стандартная библиотека</a><a class="next" href="../examples/index.html">Примеры программ →</a></nav>
+</main>
+</div>
+<footer class="footer">
+<p>Справочник по языку C — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+Подсветка: <a href="../assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="../assets/fonts/OFL.txt">OFL 1.1</a>).</p>
+</footer>
+<script src="../assets/js/prism.js"></script>
+</body>
+</html>

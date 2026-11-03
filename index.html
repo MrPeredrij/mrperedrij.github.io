@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Справочник по языку C — Справочник по C</title>
+<meta name="description" content="Справочник по языку программирования C (C11/C17): синтаксис, типы, указатели, память, стандартная библиотека и примеры.">
+<link rel="preload" href="assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="index.html"><span class="logo">C</span> Справочник по C</a>
+<span class="std">C11 · C17</span>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Разделы">
+<p class="group">Начало</p><ul>
+<li><a href="index.html" class="active" aria-current="page">Главная</a></li>
+<li><a href="getting-started/install-and-compile.html">Установка и компиляция</a></li>
+</ul>
+<p class="group">Основы</p><ul>
+<li><a href="basics/syntax.html">Синтаксис и операторы</a></li>
+<li><a href="basics/types-and-variables.html">Типы и переменные</a></li>
+<li><a href="basics/control-flow.html">Управление потоком</a></li>
+</ul>
+<p class="group">Язык</p><ul>
+<li><a href="language/functions.html">Функции</a></li>
+<li><a href="language/arrays-and-strings.html">Массивы и строки</a></li>
+<li><a href="language/pointers.html">Указатели</a></li>
+<li><a href="language/memory.html">Память</a></li>
+<li><a href="language/structs-unions-enums.html">Структуры и enum</a></li>
+<li><a href="language/preprocessor.html">Препроцессор</a></li>
+</ul>
+<p class="group">Библиотека</p><ul>
+<li><a href="library/stdlib.html">Стандартная библиотека</a></li>
+<li><a href="library/file-io.html">Работа с файлами</a></li>
+</ul>
+<p class="group">Практика</p><ul>
+<li><a href="examples/index.html">Примеры программ</a></li>
+<li><a href="faq.html">FAQ и глоссарий</a></li>
+</ul>
+</nav>
+<main>
+<img class="hero" src="image.jpg" alt="Баннер справочника по языку C" width="1600" height="600">
+<h1>Справочник по языку C</h1>
+<p class="lead">Краткий практический справочник по языку программирования C по стандартам <b>C11</b> и <b>C17</b>.
+Каждый пример на сайте — законченный фрагмент, который компилируется командой
+<code>gcc -std=c17 -Wall -Wextra</code> без предупреждений.</p>
+
+<h2>Что такое C</h2>
+<p>C — компилируемый язык общего назначения, созданный Деннисом Ритчи в Bell Labs в 1972 году для написания
+операционной системы UNIX. Он даёт прямой доступ к памяти через указатели, почти не имеет скрытых
+затрат во время выполнения и поэтому до сих пор используется в ядрах ОС, встраиваемых системах,
+драйверах, интерпретаторах и базах данных.</p>
+
+<table>
+<thead><tr><th>Стандарт</th><th>Год</th><th>Главные нововведения</th></tr></thead>
+<tbody>
+<tr><td>K&amp;R C</td><td>1978</td><td>Язык из книги «The C Programming Language»</td></tr>
+<tr><td>C89 / C90</td><td>1989–1990</td><td>Первый стандарт ANSI/ISO, прототипы функций</td></tr>
+<tr><td>C99</td><td>1999</td><td><code>//</code>-комментарии, <code>&lt;stdint.h&gt;</code>, <code>_Bool</code>, VLA, объявления в <code>for</code></td></tr>
+<tr><td>C11</td><td>2011</td><td><code>_Generic</code>, <code>_Static_assert</code>, <code>&lt;threads.h&gt;</code>, атомарные типы, анонимные структуры</td></tr>
+<tr><td>C17</td><td>2018</td><td>Исправления ошибок C11 без новых возможностей</td></tr>
+<tr><td>C23</td><td>2024</td><td><code>nullptr</code>, <code>constexpr</code>, <code>bool</code> как ключевое слово, <code>typeof</code></td></tr>
+</tbody>
+</table>
+
+<h2>Первая программа</h2>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main(void)
+{
+    printf("Привет, мир!\n");
+    return 0;
+}</code></pre></figure>
+<h2>Разделы справочника</h2>
+<div class="cards">
+<a class="card" href="getting-started/install-and-compile.html"><b>Установка и компиляция</b><span>GCC, Clang, MSVC, флаги компилятора</span></a>
+<a class="card" href="basics/syntax.html"><b>Синтаксис и операторы</b><span>Структура программы, выражения, приоритеты</span></a>
+<a class="card" href="basics/types-and-variables.html"><b>Типы и переменные</b><span>Целые, вещественные, stdint.h, константы</span></a>
+<a class="card" href="basics/control-flow.html"><b>Управление потоком</b><span>if, switch, циклы, goto</span></a>
+<a class="card" href="language/functions.html"><b>Функции</b><span>Прототипы, рекурсия, указатели на функции</span></a>
+<a class="card" href="language/arrays-and-strings.html"><b>Массивы и строки</b><span>Индексация, нуль-терминатор</span></a>
+<a class="card" href="language/pointers.html"><b>Указатели</b><span>Адресная арифметика, const, void *</span></a>
+<a class="card" href="language/memory.html"><b>Динамическая память</b><span>malloc, realloc, free</span></a>
+<a class="card" href="language/structs-unions-enums.html"><b>Структуры и перечисления</b><span>struct, union, enum, битовые поля</span></a>
+<a class="card" href="language/preprocessor.html"><b>Препроцессор</b><span>Макросы, условная компиляция, _Generic</span></a>
+<a class="card" href="library/stdlib.html"><b>Стандартная библиотека</b><span>stdio, string, stdlib, math, time</span></a>
+<a class="card" href="library/file-io.html"><b>Работа с файлами</b><span>fopen, fread, обработка ошибок</span></a>
+<a class="card" href="examples/index.html"><b>Примеры программ</b><span>Законченные программы целиком</span></a>
+<a class="card" href="faq.html"><b>FAQ и глоссарий</b><span>Частые вопросы и термины</span></a>
+</div>
+
+<h2>О сайте</h2>
+<p>Сайт сделан как индивидуальный проект к лабораторной работе 2.1 «Настройка CDN для статического веб-сайта».
+Это набор однотипных HTML-страниц с общей таблицей стилей <code>style.css</code>, локальным подсветчиком
+синтаксиса (<a href="assets/js/PRISM-LICENSE.txt">Prism, лицензия MIT</a>) и локальным шрифтом JetBrains Mono
+(<a href="assets/fonts/OFL.txt">SIL Open Font License</a>). Внешних CDN-зависимостей нет, поэтому весь
+трафик идёт с Origin-сервера и удобно анализируется в Cloudflare: HTML-страницы дают высокий Cache Hit Ratio,
+а шрифты, CSS и JS подходят для долгого TTL.</p>
+<nav class="pager" aria-label="Соседние страницы"><a class="next" href="getting-started/install-and-compile.html">Установка и компиляция →</a></nav>
+</main>
+</div>
+<footer class="footer">
+<p>Справочник по языку C — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+Подсветка: <a href="assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="assets/fonts/OFL.txt">OFL 1.1</a>).</p>
+</footer>
+<script src="assets/js/prism.js"></script>
+</body>
+</html>

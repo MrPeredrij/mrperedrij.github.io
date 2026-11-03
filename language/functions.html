@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Функции — Справочник по C</title>
+<meta name="description" content="Объявление и определение функций в C, передача аргументов, рекурсия, указатели на функции, variadic-функции.">
+<link rel="preload" href="../assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="../index.html"><span class="logo">C</span> Справочник по C</a>
+<span class="std">C11 · C17</span>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Разделы">
+<p class="group">Начало</p><ul>
+<li><a href="../index.html">Главная</a></li>
+<li><a href="../getting-started/install-and-compile.html">Установка и компиляция</a></li>
+</ul>
+<p class="group">Основы</p><ul>
+<li><a href="../basics/syntax.html">Синтаксис и операторы</a></li>
+<li><a href="../basics/types-and-variables.html">Типы и переменные</a></li>
+<li><a href="../basics/control-flow.html">Управление потоком</a></li>
+</ul>
+<p class="group">Язык</p><ul>
+<li><a href="../language/functions.html" class="active" aria-current="page">Функции</a></li>
+<li><a href="../language/arrays-and-strings.html">Массивы и строки</a></li>
+<li><a href="../language/pointers.html">Указатели</a></li>
+<li><a href="../language/memory.html">Память</a></li>
+<li><a href="../language/structs-unions-enums.html">Структуры и enum</a></li>
+<li><a href="../language/preprocessor.html">Препроцессор</a></li>
+</ul>
+<p class="group">Библиотека</p><ul>
+<li><a href="../library/stdlib.html">Стандартная библиотека</a></li>
+<li><a href="../library/file-io.html">Работа с файлами</a></li>
+</ul>
+<p class="group">Практика</p><ul>
+<li><a href="../examples/index.html">Примеры программ</a></li>
+<li><a href="../faq.html">FAQ и глоссарий</a></li>
+</ul>
+</nav>
+<main>
+<h1>Функции</h1>
+<h2>Объявление и определение</h2>
+<p><b>Прототип</b> сообщает компилятору тип результата и типы параметров. Функцию нужно объявить до первого
+вызова. Пустой список параметров записывают как <code>(void)</code>: в C17 запись <code>f()</code> означает
+«параметры не указаны», а не «параметров нет».</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+double average(const int *values, int count);   /* прототип */
+
+int main(void)
+{
+    int data[] = { 3, 8, 15, 4 };
+    printf("среднее = %.2f\n", average(data, 4));
+    return 0;
+}
+
+double average(const int *values, int count)    /* определение */
+{
+    if (count &lt;= 0)
+        return 0.0;
+    long sum = 0;
+    for (int i = 0; i &lt; count; i++)
+        sum += values[i];
+    return (double)sum / count;
+}</code></pre></figure>
+<h2>Передача аргументов по значению</h2>
+<p>В C все аргументы передаются <b>по значению</b>: функция получает копию. Чтобы изменить переменную
+вызывающей стороны, передают её адрес.</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+static void swap(int *a, int *b)
+{
+    int tmp = *a;
+    *a = *b;
+    *b = tmp;
+}
+
+int main(void)
+{
+    int x = 1, y = 2;
+    swap(&amp;x, &amp;y);
+    printf("x = %d, y = %d\n", x, y);   /* x = 2, y = 1 */
+    return 0;
+}</code></pre></figure>
+<h2>Рекурсия</h2>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+static unsigned long long factorial(unsigned n)
+{
+    return n &lt;= 1 ? 1ULL : n * factorial(n - 1);
+}
+
+static void hanoi(int n, char from, char to, char via)
+{
+    if (n == 0)
+        return;
+    hanoi(n - 1, from, via, to);
+    printf("диск %d: %c -&gt; %c\n", n, from, to);
+    hanoi(n - 1, via, to, from);
+}
+
+int main(void)
+{
+    printf("20! = %llu\n", factorial(20));
+    hanoi(3, 'A', 'C', 'B');
+    return 0;
+}</code></pre></figure>
+<h2>Указатели на функции</h2>
+<p>Функцию можно передать как аргумент. Так устроена стандартная <code>qsort</code>.</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+typedef int (*binary_op)(int, int);
+
+static int add(int a, int b) { return a + b; }
+static int mul(int a, int b) { return a * b; }
+
+static int fold(const int *v, size_t n, int init, binary_op op)
+{
+    int acc = init;
+    for (size_t i = 0; i &lt; n; i++)
+        acc = op(acc, v[i]);
+    return acc;
+}
+
+static int cmp_desc(const void *pa, const void *pb)
+{
+    int a = *(const int *)pa, b = *(const int *)pb;
+    return (a &lt; b) - (a &gt; b);
+}
+
+int main(void)
+{
+    int v[] = { 4, 1, 5, 2, 3 };
+    size_t n = sizeof v / sizeof v[0];
+
+    printf("сумма = %d, произведение = %d\n", fold(v, n, 0, add), fold(v, n, 1, mul));
+
+    qsort(v, n, sizeof v[0], cmp_desc);
+    for (size_t i = 0; i &lt; n; i++)
+        printf("%d ", v[i]);
+    putchar('\n');
+    return 0;
+}</code></pre></figure>
+<h2>Функции с переменным числом аргументов</h2>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdarg.h&gt;
+
+static int sum_ints(int count, ...)
+{
+    va_list ap;
+    va_start(ap, count);
+    int total = 0;
+    for (int i = 0; i &lt; count; i++)
+        total += va_arg(ap, int);
+    va_end(ap);
+    return total;
+}
+
+int main(void)
+{
+    printf("%d\n", sum_ints(4, 10, 20, 30, 40));   /* 100 */
+    return 0;
+}</code></pre></figure>
+<h2>inline и noreturn</h2>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdnoreturn.h&gt;
+
+static inline int square(int x) { return x * x; }
+
+noreturn static void die(const char *msg)
+{
+    fprintf(stderr, "ошибка: %s\n", msg);
+    exit(EXIT_FAILURE);
+}
+
+int main(int argc, char *argv[])
+{
+    if (argc &gt; 2)
+        die("слишком много аргументов");
+    printf("%s: 7^2 = %d\n", argv[0], square(7));
+    return 0;
+}</code></pre></figure>
+<div class="note">Параметры <code>argc</code> и <code>argv</code> функции <code>main</code> содержат число аргументов
+командной строки и сами аргументы; <code>argv[0]</code> — имя программы, <code>argv[argc]</code> равен <code>NULL</code>.</div>
+<nav class="pager" aria-label="Соседние страницы"><a class="prev" href="../basics/control-flow.html">← Управление потоком</a><a class="next" href="../language/arrays-and-strings.html">Массивы и строки →</a></nav>
+</main>
+</div>
+<footer class="footer">
+<p>Справочник по языку C — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+Подсветка: <a href="../assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="../assets/fonts/OFL.txt">OFL 1.1</a>).</p>
+</footer>
+<script src="../assets/js/prism.js"></script>
+</body>
+</html>

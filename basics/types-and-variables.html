@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Типы данных и переменные — Справочник по C</title>
+<meta name="description" content="Базовые типы C, размеры, stdint.h, литералы, квалификаторы, классы памяти и преобразования типов.">
+<link rel="preload" href="../assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="../index.html"><span class="logo">C</span> Справочник по C</a>
+<span class="std">C11 · C17</span>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Разделы">
+<p class="group">Начало</p><ul>
+<li><a href="../index.html">Главная</a></li>
+<li><a href="../getting-started/install-and-compile.html">Установка и компиляция</a></li>
+</ul>
+<p class="group">Основы</p><ul>
+<li><a href="../basics/syntax.html">Синтаксис и операторы</a></li>
+<li><a href="../basics/types-and-variables.html" class="active" aria-current="page">Типы и переменные</a></li>
+<li><a href="../basics/control-flow.html">Управление потоком</a></li>
+</ul>
+<p class="group">Язык</p><ul>
+<li><a href="../language/functions.html">Функции</a></li>
+<li><a href="../language/arrays-and-strings.html">Массивы и строки</a></li>
+<li><a href="../language/pointers.html">Указатели</a></li>
+<li><a href="../language/memory.html">Память</a></li>
+<li><a href="../language/structs-unions-enums.html">Структуры и enum</a></li>
+<li><a href="../language/preprocessor.html">Препроцессор</a></li>
+</ul>
+<p class="group">Библиотека</p><ul>
+<li><a href="../library/stdlib.html">Стандартная библиотека</a></li>
+<li><a href="../library/file-io.html">Работа с файлами</a></li>
+</ul>
+<p class="group">Практика</p><ul>
+<li><a href="../examples/index.html">Примеры программ</a></li>
+<li><a href="../faq.html">FAQ и глоссарий</a></li>
+</ul>
+</nav>
+<main>
+<h1>Типы данных и переменные</h1>
+<h2>Базовые типы</h2>
+<p>Стандарт задаёт только минимальные диапазоны; реальные размеры зависят от платформы. В таблице — типичные
+значения для 64-битного Linux (модель LP64).</p>
+<table>
+<thead><tr><th>Тип</th><th>Размер, байт</th><th>Минимальный диапазон по стандарту</th><th>Формат printf</th></tr></thead>
+<tbody>
+<tr><td><code>char</code></td><td>1</td><td>знаковость зависит от реализации</td><td><code>%c</code></td></tr>
+<tr><td><code>signed char</code></td><td>1</td><td>−127…127</td><td><code>%hhd</code></td></tr>
+<tr><td><code>short</code></td><td>2</td><td>−32767…32767</td><td><code>%hd</code></td></tr>
+<tr><td><code>int</code></td><td>4</td><td>−32767…32767</td><td><code>%d</code></td></tr>
+<tr><td><code>long</code></td><td>8 (4 в Windows)</td><td>−(2<sup>31</sup>−1)…2<sup>31</sup>−1</td><td><code>%ld</code></td></tr>
+<tr><td><code>long long</code></td><td>8</td><td>−(2<sup>63</sup>−1)…2<sup>63</sup>−1</td><td><code>%lld</code></td></tr>
+<tr><td><code>float</code></td><td>4</td><td>6 значащих десятичных цифр</td><td><code>%f</code></td></tr>
+<tr><td><code>double</code></td><td>8</td><td>10 значащих цифр (на практике 15)</td><td><code>%f</code>, <code>%g</code></td></tr>
+<tr><td><code>long double</code></td><td>16 (x86-64)</td><td>не меньше <code>double</code></td><td><code>%Lf</code></td></tr>
+<tr><td><code>_Bool</code> / <code>bool</code></td><td>1</td><td>0 или 1</td><td><code>%d</code></td></tr>
+</tbody>
+</table>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;limits.h&gt;
+#include &lt;float.h&gt;
+
+int main(void)
+{
+    printf("char:        %zu байт, CHAR_BIT = %d\n", sizeof(char), CHAR_BIT);
+    printf("int:         %zu байт, %d..%d\n", sizeof(int), INT_MIN, INT_MAX);
+    printf("long:        %zu байт\n", sizeof(long));
+    printf("long long:   %zu байт, max = %lld\n", sizeof(long long), LLONG_MAX);
+    printf("double:      %zu байт, DBL_EPSILON = %g\n", sizeof(double), DBL_EPSILON);
+    printf("void *:      %zu байт\n", sizeof(void *));
+    return 0;
+}</code></pre></figure>
+<h2>Целые типы фиксированного размера</h2>
+<p>Заголовок <code>&lt;stdint.h&gt;</code> (C99) даёт типы с точно известной шириной, а
+<code>&lt;inttypes.h&gt;</code> — макросы форматов для них. <code>&lt;stdbool.h&gt;</code> определяет
+<code>bool</code>, <code>true</code> и <code>false</code>.</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;inttypes.h&gt;
+#include &lt;stdbool.h&gt;
+
+int main(void)
+{
+    uint8_t  byte  = 255;
+    int32_t  temp  = -40;
+    uint64_t big   = UINT64_C(18446744073709551615);
+    size_t   count = sizeof big;     /* тип результата sizeof */
+    bool     ready = true;
+
+    printf("%" PRIu8 " %" PRId32 " %" PRIu64 " %zu %d\n",
+           byte, temp, big, count, ready);
+    return 0;
+}</code></pre></figure>
+<h2>Литералы</h2>
+<ul>
+<li>Целые: <code>42</code>, <code>052</code> (восьмеричный), <code>0x2A</code> (шестнадцатеричный); суффиксы <code>u</code>, <code>l</code>, <code>ll</code>: <code>42ul</code>.</li>
+<li>Вещественные: <code>3.14</code> (<code>double</code>), <code>3.14f</code> (<code>float</code>), <code>1e-9</code>, <code>0x1.8p1</code> (= 3.0).</li>
+<li>Символьные: <code>'A'</code>, <code>'\n'</code>, <code>'\0'</code>, <code>'\x41'</code>. Тип символьного литерала в C — <code>int</code>.</li>
+<li>Строковые: <code>"текст"</code> — массив <code>char</code> с завершающим <code>'\0'</code>.</li>
+</ul>
+
+<h2>Квалификаторы и классы памяти</h2>
+<table>
+<thead><tr><th>Слово</th><th>Значение</th></tr></thead>
+<tbody>
+<tr><td><code>const</code></td><td>объект нельзя изменять через это имя</td></tr>
+<tr><td><code>volatile</code></td><td>каждое обращение должно выполняться (регистры устройств, обработчики сигналов)</td></tr>
+<tr><td><code>static</code></td><td>у локальной переменной — время жизни всей программы; у глобального имени — видимость только в своём файле</td></tr>
+<tr><td><code>extern</code></td><td>объявление без определения: объект определён в другом файле</td></tr>
+<tr><td><code>_Thread_local</code></td><td>отдельный экземпляр для каждого потока (C11)</td></tr>
+</tbody>
+</table>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+static int next_id(void)
+{
+    static int id = 0;   /* инициализируется один раз */
+    return ++id;
+}
+
+int main(void)
+{
+    const double pi = 3.14159265358979;
+    for (int i = 0; i &lt; 3; i++)
+        printf("id = %d\n", next_id());   /* 1, 2, 3 */
+    printf("pi = %.5f\n", pi);
+    return 0;
+}</code></pre></figure>
+<h2>Преобразования типов</h2>
+<p>В выражениях действуют <i>обычные арифметические преобразования</i>: типы меньше <code>int</code>
+повышаются до <code>int</code>, затем операнды приводятся к общему типу. Смешивание знаковых и беззнаковых
+целых — частый источник ошибок: при сравнении <code>-1 &lt; 1u</code> значение <code>-1</code> превращается
+в <code>UINT_MAX</code>, и результат оказывается ложным.</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;limits.h&gt;
+
+int main(void)
+{
+    int total = 7, parts = 2;
+    double avg = (double)total / parts;   /* 3.5, а не 3 */
+    printf("avg = %.1f, без приведения = %d\n", avg, total / parts);
+
+    int s = -1;
+    unsigned int as_unsigned = (unsigned int)s;   /* по модулю 2^N */
+    printf("(unsigned)-1 = %u, UINT_MAX = %u\n", as_unsigned, UINT_MAX);
+
+    double d = 3.99;
+    int truncated = (int)d;              /* дробная часть отбрасывается: 3 */
+    printf("(int)3.99 = %d\n", truncated);
+    return 0;
+}</code></pre></figure>
+<div class="warn">Переполнение знакового целого — неопределённое поведение. Беззнаковые типы при переполнении
+«заворачиваются» по модулю 2<sup>N</sup>, это определено стандартом.</div>
+<nav class="pager" aria-label="Соседние страницы"><a class="prev" href="../basics/syntax.html">← Синтаксис и операторы</a><a class="next" href="../basics/control-flow.html">Управление потоком →</a></nav>
+</main>
+</div>
+<footer class="footer">
+<p>Справочник по языку C — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+Подсветка: <a href="../assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="../assets/fonts/OFL.txt">OFL 1.1</a>).</p>
+</footer>
+<script src="../assets/js/prism.js"></script>
+</body>
+</html>

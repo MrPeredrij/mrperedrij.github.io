@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FAQ и глоссарий — Справочник по C</title>
+<meta name="description" content="Частые вопросы о языке C и глоссарий терминов: неопределённое поведение, единица трансляции, lvalue и другие.">
+<link rel="preload" href="assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="index.html"><span class="logo">C</span> Справочник по C</a>
+<span class="std">C11 · C17</span>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Разделы">
+<p class="group">Начало</p><ul>
+<li><a href="index.html">Главная</a></li>
+<li><a href="getting-started/install-and-compile.html">Установка и компиляция</a></li>
+</ul>
+<p class="group">Основы</p><ul>
+<li><a href="basics/syntax.html">Синтаксис и операторы</a></li>
+<li><a href="basics/types-and-variables.html">Типы и переменные</a></li>
+<li><a href="basics/control-flow.html">Управление потоком</a></li>
+</ul>
+<p class="group">Язык</p><ul>
+<li><a href="language/functions.html">Функции</a></li>
+<li><a href="language/arrays-and-strings.html">Массивы и строки</a></li>
+<li><a href="language/pointers.html">Указатели</a></li>
+<li><a href="language/memory.html">Память</a></li>
+<li><a href="language/structs-unions-enums.html">Структуры и enum</a></li>
+<li><a href="language/preprocessor.html">Препроцессор</a></li>
+</ul>
+<p class="group">Библиотека</p><ul>
+<li><a href="library/stdlib.html">Стандартная библиотека</a></li>
+<li><a href="library/file-io.html">Работа с файлами</a></li>
+</ul>
+<p class="group">Практика</p><ul>
+<li><a href="examples/index.html">Примеры программ</a></li>
+<li><a href="faq.html" class="active" aria-current="page">FAQ и глоссарий</a></li>
+</ul>
+</nav>
+<main>
+<h1>FAQ и глоссарий</h1>
+<h2>Частые вопросы</h2>
+<details open><summary>Чем C отличается от C++?</summary>
+<p>C++ вырос из C, но это разные языки. В C нет классов, шаблонов, исключений, ссылок и перегрузки функций.
+Часть корректного кода на C не компилируется как C++: например, неявное преобразование <code>void *</code>
+в другой указатель или назначенные инициализаторы массивов.</p></details>
+
+<details><summary>Почему программа печатает «мусор» вместо значения переменной?</summary>
+<p>Скорее всего, переменная не инициализирована. Локальные переменные в C не обнуляются автоматически,
+в отличие от глобальных и <code>static</code>. Флаг <code>-Wall</code> (и <code>-Wmaybe-uninitialized</code>
+при оптимизации) помогает найти такие места.</p></details>
+
+<details><summary>Что значит «Segmentation fault»?</summary>
+<p>Программа обратилась к памяти, которая ей не принадлежит: разыменовала <code>NULL</code>, вышла за границу
+массива, использовала освобождённую память или переполнила стек глубокой рекурсией. Соберите программу с
+<code>-g -fsanitize=address</code> — санитайзер покажет строку с ошибкой.</p></details>
+
+<details><summary>Почему <code>sizeof</code> массива внутри функции возвращает 8?</summary>
+<p>Параметр-массив на самом деле является указателем, и <code>sizeof</code> возвращает размер указателя.
+Передавайте длину массива отдельным параметром. Подробнее — в разделе
+<a href="language/arrays-and-strings.html">«Массивы и строки»</a>.</p></details>
+
+<details><summary>Как вывести русский текст в консоли Windows?</summary>
+<p>Сохраните исходник в UTF-8 и переключите консоль на UTF-8 командой <code>chcp 65001</code>, либо вызовите
+<code>SetConsoleOutputCP(CP_UTF8)</code> из <code>&lt;windows.h&gt;</code>. В Linux и macOS UTF-8 обычно
+работает без настройки.</p></details>
+
+<details><summary>Какой стандарт выбрать для нового проекта?</summary>
+<p>C17 — самый распространённый и поддерживаемый всеми основными компиляторами. C23 можно использовать,
+если компилятор его поддерживает (свежие GCC и Clang, флаг <code>-std=c23</code> или <code>-std=c2x</code>).</p></details>
+
+<details><summary>Нужно ли приводить результат <code>malloc</code>?</summary>
+<p>В C — нет, <code>void *</code> преобразуется неявно. См. <a href="language/memory.html">«Динамическая память»</a>.</p></details>
+
+<h2>Глоссарий</h2>
+<dl>
+<dt>Единица трансляции</dt><dd>Исходный файл после препроцессирования — то, что компилятор обрабатывает за один раз.</dd>
+<dt>Заголовочный файл</dt><dd>Файл <code>.h</code> с объявлениями, который подключается через <code>#include</code>.</dd>
+<dt>Компоновка (linkage)</dt><dd>Видимость имени между единицами трансляции: внешняя (<code>extern</code>), внутренняя (<code>static</code>) или отсутствует.</dd>
+<dt>Неопределённое поведение (UB)</dt><dd>Ситуация, для которой стандарт не задаёт результата: переполнение <code>int</code>, выход за границы массива, разыменование <code>NULL</code>. Компилятор вправе считать, что UB никогда не случается.</dd>
+<dt>Неуточнённое поведение</dt><dd>Стандарт допускает несколько вариантов, например порядок вычисления аргументов функции.</dd>
+<dt>Поведение, определяемое реализацией</dt><dd>Вариант выбирает компилятор и документирует его, например знаковость <code>char</code> или размер <code>long</code>.</dd>
+<dt>lvalue</dt><dd>Выражение, обозначающее объект в памяти: <code>x</code>, <code>a[i]</code>, <code>*p</code>.</dd>
+<dt>Нуль-терминатор</dt><dd>Символ <code>'\0'</code>, отмечающий конец строки в C.</dd>
+<dt>Указатель</dt><dd>Объект, хранящий адрес другого объекта или функции. См. <a href="language/pointers.html">«Указатели»</a>.</dd>
+<dt>Куча (heap)</dt><dd>Область динамической памяти, управляемая через <code>malloc</code> и <code>free</code>.</dd>
+<dt>Стек вызовов</dt><dd>Область памяти для локальных переменных и адресов возврата функций.</dd>
+<dt>Упорядочивание (sequenced before)</dt><dd>Отношение C11, определяющее, какие вычисления и побочные эффекты завершаются раньше других; в C89/C99 — «точки следования».</dd>
+<dt>Макрос</dt><dd>Именованный фрагмент текста, подставляемый препроцессором. См. <a href="language/preprocessor.html">«Препроцессор»</a>.</dd>
+<dt>Выравнивание</dt><dd>Требование размещать объект по адресу, кратному определённому числу байт.</dd>
+<dt>Санитайзер</dt><dd>Инструмент компилятора (<code>-fsanitize=...</code>), который вставляет проверки в программу и сообщает об ошибках во время выполнения.</dd>
+</dl>
+<nav class="pager" aria-label="Соседние страницы"><a class="prev" href="examples/index.html">← Примеры программ</a></nav>
+</main>
+</div>
+<footer class="footer">
+<p>Справочник по языку C — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+Подсветка: <a href="assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="assets/fonts/OFL.txt">OFL 1.1</a>).</p>
+</footer>
+<script src="assets/js/prism.js"></script>
+</body>
+</html>

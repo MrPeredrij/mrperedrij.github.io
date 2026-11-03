@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Динамическая память — Справочник по C</title>
+<meta name="description" content="Динамическое выделение памяти в C: malloc, calloc, realloc, free, утечки и типичные ошибки.">
+<link rel="preload" href="../assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="../index.html"><span class="logo">C</span> Справочник по C</a>
+<span class="std">C11 · C17</span>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Разделы">
+<p class="group">Начало</p><ul>
+<li><a href="../index.html">Главная</a></li>
+<li><a href="../getting-started/install-and-compile.html">Установка и компиляция</a></li>
+</ul>
+<p class="group">Основы</p><ul>
+<li><a href="../basics/syntax.html">Синтаксис и операторы</a></li>
+<li><a href="../basics/types-and-variables.html">Типы и переменные</a></li>
+<li><a href="../basics/control-flow.html">Управление потоком</a></li>
+</ul>
+<p class="group">Язык</p><ul>
+<li><a href="../language/functions.html">Функции</a></li>
+<li><a href="../language/arrays-and-strings.html">Массивы и строки</a></li>
+<li><a href="../language/pointers.html">Указатели</a></li>
+<li><a href="../language/memory.html" class="active" aria-current="page">Память</a></li>
+<li><a href="../language/structs-unions-enums.html">Структуры и enum</a></li>
+<li><a href="../language/preprocessor.html">Препроцессор</a></li>
+</ul>
+<p class="group">Библиотека</p><ul>
+<li><a href="../library/stdlib.html">Стандартная библиотека</a></li>
+<li><a href="../library/file-io.html">Работа с файлами</a></li>
+</ul>
+<p class="group">Практика</p><ul>
+<li><a href="../examples/index.html">Примеры программ</a></li>
+<li><a href="../faq.html">FAQ и глоссарий</a></li>
+</ul>
+</nav>
+<main>
+<h1>Динамическая память</h1>
+<p>Объекты в C живут в одной из трёх областей:</p>
+<ul>
+<li><b>статическая</b> — глобальные и <code>static</code>-переменные, живут всё время работы программы;</li>
+<li><b>автоматическая</b> (стек) — локальные переменные, уничтожаются при выходе из блока;</li>
+<li><b>динамическая</b> (куча) — память, выделенная функциями из <code>&lt;stdlib.h&gt;</code>; живёт до вызова <code>free</code>.</li>
+</ul>
+
+<table>
+<thead><tr><th>Функция</th><th>Действие</th></tr></thead>
+<tbody>
+<tr><td><code>malloc(size)</code></td><td>выделить <code>size</code> байт, содержимое не определено</td></tr>
+<tr><td><code>calloc(n, size)</code></td><td>выделить <code>n * size</code> байт, заполненных нулями</td></tr>
+<tr><td><code>realloc(p, size)</code></td><td>изменить размер блока; может переместить его</td></tr>
+<tr><td><code>free(p)</code></td><td>освободить блок; <code>free(NULL)</code> безопасен</td></tr>
+<tr><td><code>aligned_alloc(al, size)</code></td><td>выделить память с выравниванием <code>al</code> (C11)</td></tr>
+</tbody>
+</table>
+
+<h2>Выделение и освобождение</h2>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+int main(void)
+{
+    size_t n = 10;
+    int *squares = malloc(n * sizeof *squares);   /* sizeof *p — не нужно повторять тип */
+    if (squares == NULL) {
+        perror("malloc");
+        return EXIT_FAILURE;
+    }
+
+    for (size_t i = 0; i &lt; n; i++)
+        squares[i] = (int)(i * i);
+    printf("squares[9] = %d\n", squares[9]);
+
+    free(squares);
+    squares = NULL;     /* защита от повторного использования */
+    return EXIT_SUCCESS;
+}</code></pre></figure>
+<h2>Растущий массив и realloc</h2>
+<p>Результат <code>realloc</code> записывают во временную переменную: при ошибке функция возвращает
+<code>NULL</code>, а старый блок остаётся выделенным.</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+typedef struct {
+    int    *data;
+    size_t  len;
+    size_t  cap;
+} IntVec;
+
+static int vec_push(IntVec *v, int value)
+{
+    if (v-&gt;len == v-&gt;cap) {
+        size_t new_cap = v-&gt;cap ? v-&gt;cap * 2 : 4;
+        int *p = realloc(v-&gt;data, new_cap * sizeof *p);
+        if (p == NULL)
+            return -1;          /* v-&gt;data всё ещё действителен */
+        v-&gt;data = p;
+        v-&gt;cap = new_cap;
+    }
+    v-&gt;data[v-&gt;len++] = value;
+    return 0;
+}
+
+static void vec_free(IntVec *v)
+{
+    free(v-&gt;data);
+    v-&gt;data = NULL;
+    v-&gt;len = v-&gt;cap = 0;
+}
+
+int main(void)
+{
+    IntVec v = { 0 };
+    for (int i = 1; i &lt;= 100; i++)
+        if (vec_push(&amp;v, i * 3) != 0) {
+            vec_free(&amp;v);
+            return EXIT_FAILURE;
+        }
+    printf("len = %zu, cap = %zu, last = %d\n", v.len, v.cap, v.data[v.len - 1]);
+    vec_free(&amp;v);
+    return EXIT_SUCCESS;
+}</code></pre></figure>
+<h2>Двумерный массив в куче</h2>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+int main(void)
+{
+    size_t rows = 3, cols = 4;
+    /* один непрерывный блок; доступ m[r * cols + c] */
+    double *m = calloc(rows * cols, sizeof *m);
+    if (m == NULL)
+        return EXIT_FAILURE;
+
+    for (size_t r = 0; r &lt; rows; r++)
+        for (size_t col = 0; col &lt; cols; col++)
+            m[r * cols + col] = (double)(r + 1) * (double)(col + 1);
+
+    for (size_t r = 0; r &lt; rows; r++) {
+        for (size_t col = 0; col &lt; cols; col++)
+            printf("%5.1f", m[r * cols + col]);
+        putchar('\n');
+    }
+    free(m);
+    return EXIT_SUCCESS;
+}</code></pre></figure>
+<h2>Типичные ошибки</h2>
+<table>
+<thead><tr><th>Ошибка</th><th>Последствие</th><th>Как найти</th></tr></thead>
+<tbody>
+<tr><td>Нет <code>free</code></td><td>утечка памяти</td><td><code>valgrind --leak-check=full</code>, <code>-fsanitize=address</code></td></tr>
+<tr><td>Двойной <code>free</code></td><td>повреждение кучи</td><td>ASan: <i>double-free</i></td></tr>
+<tr><td>Доступ после <code>free</code></td><td>неопределённое поведение</td><td>ASan: <i>heap-use-after-free</i></td></tr>
+<tr><td>Выход за границу блока</td><td>порча соседних данных</td><td>ASan: <i>heap-buffer-overflow</i></td></tr>
+<tr><td>Не проверен результат <code>malloc</code></td><td>разыменование <code>NULL</code></td><td>проверять всегда</td></tr>
+</tbody>
+</table>
+<div class="note">В C результат <code>malloc</code> не нужно приводить к типу: <code>void *</code> преобразуется неявно.
+Приведение <code>(int *)malloc(...)</code> обязательно только в C++.</div>
+<nav class="pager" aria-label="Соседние страницы"><a class="prev" href="../language/pointers.html">← Указатели</a><a class="next" href="../language/structs-unions-enums.html">Структуры и enum →</a></nav>
+</main>
+</div>
+<footer class="footer">
+<p>Справочник по языку C — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+Подсветка: <a href="../assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="../assets/fonts/OFL.txt">OFL 1.1</a>).</p>
+</footer>
+<script src="../assets/js/prism.js"></script>
+</body>
+</html>

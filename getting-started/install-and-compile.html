@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Установка и компиляция — Справочник по C</title>
+<meta name="description" content="Как установить компилятор C (GCC, Clang, MSVC) и собрать программу.">
+<link rel="preload" href="../assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="../index.html"><span class="logo">C</span> Справочник по C</a>
+<span class="std">C11 · C17</span>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Разделы">
+<p class="group">Начало</p><ul>
+<li><a href="../index.html">Главная</a></li>
+<li><a href="../getting-started/install-and-compile.html" class="active" aria-current="page">Установка и компиляция</a></li>
+</ul>
+<p class="group">Основы</p><ul>
+<li><a href="../basics/syntax.html">Синтаксис и операторы</a></li>
+<li><a href="../basics/types-and-variables.html">Типы и переменные</a></li>
+<li><a href="../basics/control-flow.html">Управление потоком</a></li>
+</ul>
+<p class="group">Язык</p><ul>
+<li><a href="../language/functions.html">Функции</a></li>
+<li><a href="../language/arrays-and-strings.html">Массивы и строки</a></li>
+<li><a href="../language/pointers.html">Указатели</a></li>
+<li><a href="../language/memory.html">Память</a></li>
+<li><a href="../language/structs-unions-enums.html">Структуры и enum</a></li>
+<li><a href="../language/preprocessor.html">Препроцессор</a></li>
+</ul>
+<p class="group">Библиотека</p><ul>
+<li><a href="../library/stdlib.html">Стандартная библиотека</a></li>
+<li><a href="../library/file-io.html">Работа с файлами</a></li>
+</ul>
+<p class="group">Практика</p><ul>
+<li><a href="../examples/index.html">Примеры программ</a></li>
+<li><a href="../faq.html">FAQ и глоссарий</a></li>
+</ul>
+</nav>
+<main>
+<h1>Установка и компиляция</h1>
+<p>Программа на C — это текстовые файлы с исходным кодом (<code>.c</code>) и заголовками (<code>.h</code>).
+Компилятор превращает их в исполняемый файл. Сборка проходит четыре стадии:</p>
+<ol>
+<li><b>Препроцессирование</b> — подстановка <code>#include</code> и макросов (<code>gcc -E</code>).</li>
+<li><b>Компиляция</b> — перевод в ассемблер (<code>gcc -S</code>).</li>
+<li><b>Ассемблирование</b> — получение объектного файла <code>.o</code> (<code>gcc -c</code>).</li>
+<li><b>Компоновка</b> — объединение объектных файлов и библиотек в программу.</li>
+</ol>
+
+<h2>Установка компилятора</h2>
+<table>
+<thead><tr><th>ОС</th><th>Команда / способ</th></tr></thead>
+<tbody>
+<tr><td>Debian, Ubuntu</td><td><code>sudo apt install build-essential</code></td></tr>
+<tr><td>Fedora</td><td><code>sudo dnf install gcc make</code></td></tr>
+<tr><td>macOS</td><td><code>xcode-select --install</code> (устанавливает Clang)</td></tr>
+<tr><td>Windows</td><td>MSYS2 (<code>pacman -S mingw-w64-ucrt-x86_64-gcc</code>) или Visual Studio с компонентом «Разработка классических приложений на C++»</td></tr>
+</tbody>
+</table>
+
+<h2>Сборка одной программы</h2>
+<figure class="code"><figcaption>Терминал</figcaption><pre><code class="language-bash">gcc -std=c17 -Wall -Wextra -O2 -o hello hello.c
+./hello</code></pre></figure>
+<h2>Полезные флаги GCC и Clang</h2>
+<table>
+<thead><tr><th>Флаг</th><th>Назначение</th></tr></thead>
+<tbody>
+<tr><td><code>-std=c17</code></td><td>Выбрать стандарт языка (<code>c99</code>, <code>c11</code>, <code>c17</code>, <code>c2x</code>)</td></tr>
+<tr><td><code>-Wall -Wextra</code></td><td>Включить основные и дополнительные предупреждения</td></tr>
+<tr><td><code>-pedantic</code></td><td>Предупреждать о расширениях, не входящих в стандарт</td></tr>
+<tr><td><code>-O0</code> … <code>-O3</code>, <code>-Os</code></td><td>Уровень оптимизации</td></tr>
+<tr><td><code>-g</code></td><td>Отладочная информация для <code>gdb</code></td></tr>
+<tr><td><code>-fsanitize=address,undefined</code></td><td>Поиск ошибок памяти и неопределённого поведения во время выполнения</td></tr>
+<tr><td><code>-lm</code></td><td>Подключить математическую библиотеку <code>libm</code></td></tr>
+</tbody>
+</table>
+
+<h2>Программа из нескольких файлов</h2>
+<p>Объявления выносят в заголовок, определения — в <code>.c</code>-файл. Защита от повторного включения
+(<i>include guard</i>) не даёт заголовку подключиться дважды.</p>
+<figure class="code"><figcaption>mathutil.h</figcaption><pre><code class="language-c">/* mathutil.h */
+#ifndef MATHUTIL_H
+#define MATHUTIL_H
+
+int gcd(int a, int b);
+
+#endif</code></pre></figure><figure class="code"><figcaption>mathutil.c</figcaption><pre><code class="language-c">/* mathutil.c */
+#include "mathutil.h"
+
+int gcd(int a, int b)
+{
+    while (b != 0) {
+        int t = a % b;
+        a = b;
+        b = t;
+    }
+    return a;
+}</code></pre></figure><figure class="code"><figcaption>main.c</figcaption><pre><code class="language-c">/* main.c */
+#include &lt;stdio.h&gt;
+#include "mathutil.h"
+
+int main(void)
+{
+    printf("gcd(84, 36) = %d\n", gcd(84, 36));
+    return 0;
+}</code></pre></figure><figure class="code"><figcaption>Терминал</figcaption><pre><code class="language-bash">gcc -std=c17 -Wall -Wextra -c mathutil.c
+gcc -std=c17 -Wall -Wextra -c main.c
+gcc -o app main.o mathutil.o
+./app</code></pre></figure>
+<h2>Минимальный Makefile</h2>
+<p>Строки с командами в Makefile должны начинаться с символа табуляции.</p>
+<figure class="code"><figcaption>Makefile</figcaption><pre><code class="language-none">CC      = gcc
+CFLAGS  = -std=c17 -Wall -Wextra -O2
+OBJS    = main.o mathutil.o
+
+app: $(OBJS)
+	$(CC) -o $@ $(OBJS)
+
+main.o mathutil.o: mathutil.h
+
+clean:
+	rm -f app $(OBJS)</code></pre></figure>
+<div class="note">Функция <code>main</code> возвращает код завершения: <code>0</code> (или <code>EXIT_SUCCESS</code>) означает успех.
+Начиная с C99 при выходе из <code>main</code> без <code>return</code> автоматически возвращается 0.</div>
+<nav class="pager" aria-label="Соседние страницы"><a class="prev" href="../index.html">← Главная</a><a class="next" href="../basics/syntax.html">Синтаксис и операторы →</a></nav>
+</main>
+</div>
+<footer class="footer">
+<p>Справочник по языку C — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+Подсветка: <a href="../assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="../assets/fonts/OFL.txt">OFL 1.1</a>).</p>
+</footer>
+<script src="../assets/js/prism.js"></script>
+</body>
+</html>

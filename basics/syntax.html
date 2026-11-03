@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Синтаксис и операторы — Справочник по C</title>
+<meta name="description" content="Структура программы на C, комментарии, идентификаторы, ключевые слова, операторы и их приоритет.">
+<link rel="preload" href="../assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="../index.html"><span class="logo">C</span> Справочник по C</a>
+<span class="std">C11 · C17</span>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Разделы">
+<p class="group">Начало</p><ul>
+<li><a href="../index.html">Главная</a></li>
+<li><a href="../getting-started/install-and-compile.html">Установка и компиляция</a></li>
+</ul>
+<p class="group">Основы</p><ul>
+<li><a href="../basics/syntax.html" class="active" aria-current="page">Синтаксис и операторы</a></li>
+<li><a href="../basics/types-and-variables.html">Типы и переменные</a></li>
+<li><a href="../basics/control-flow.html">Управление потоком</a></li>
+</ul>
+<p class="group">Язык</p><ul>
+<li><a href="../language/functions.html">Функции</a></li>
+<li><a href="../language/arrays-and-strings.html">Массивы и строки</a></li>
+<li><a href="../language/pointers.html">Указатели</a></li>
+<li><a href="../language/memory.html">Память</a></li>
+<li><a href="../language/structs-unions-enums.html">Структуры и enum</a></li>
+<li><a href="../language/preprocessor.html">Препроцессор</a></li>
+</ul>
+<p class="group">Библиотека</p><ul>
+<li><a href="../library/stdlib.html">Стандартная библиотека</a></li>
+<li><a href="../library/file-io.html">Работа с файлами</a></li>
+</ul>
+<p class="group">Практика</p><ul>
+<li><a href="../examples/index.html">Примеры программ</a></li>
+<li><a href="../faq.html">FAQ и глоссарий</a></li>
+</ul>
+</nav>
+<main>
+<h1>Синтаксис и операторы</h1>
+<h2>Структура программы</h2>
+<p>Программа состоит из объявлений и определений функций и переменных. Выполнение начинается с функции
+<code>main</code>. Инструкции завершаются точкой с запятой, блоки ограничиваются фигурными скобками.</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;          /* директива препроцессора */
+
+#define GREETING "Здравствуй"  /* макрос */
+
+static int counter = 0;     /* глобальная переменная с внутренней компоновкой */
+
+static void greet(const char *name)   /* определение функции */
+{
+    counter++;
+    printf("%s, %s! (%d)\n", GREETING, name, counter);
+}
+
+int main(void)
+{
+    greet("Алиса");         // однострочный комментарий (C99)
+    greet("Боб");
+    return 0;
+}</code></pre></figure>
+<h2>Идентификаторы и ключевые слова</h2>
+<p>Идентификатор начинается с буквы или <code>_</code> и состоит из латинских букв, цифр и <code>_</code>.
+Регистр важен: <code>count</code> и <code>Count</code> — разные имена. Имена, начинающиеся с <code>_</code> и
+заглавной буквы или с двух подчёркиваний, зарезервированы за реализацией.</p>
+<p>Ключевые слова C17 (44 слова):</p>
+<p class="kw"><code>auto break case char const continue default do double else enum extern float for goto if
+inline int long register restrict return short signed sizeof static struct switch typedef union unsigned
+void volatile while _Alignas _Alignof _Atomic _Bool _Complex _Generic _Imaginary _Noreturn _Static_assert
+_Thread_local</code></p>
+
+<h2>Операторы</h2>
+<table>
+<thead><tr><th>Группа</th><th>Операторы</th></tr></thead>
+<tbody>
+<tr><td>Арифметические</td><td><code>+ - * / %</code></td></tr>
+<tr><td>Инкремент и декремент</td><td><code>++ --</code> (префиксные и постфиксные)</td></tr>
+<tr><td>Сравнения</td><td><code>== != &lt; &gt; &lt;= &gt;=</code> (результат — <code>int</code> 0 или 1)</td></tr>
+<tr><td>Логические</td><td><code>&amp;&amp; || !</code> (вычисляются по короткой схеме)</td></tr>
+<tr><td>Побитовые</td><td><code>&amp; | ^ ~ &lt;&lt; &gt;&gt;</code></td></tr>
+<tr><td>Присваивания</td><td><code>= += -= *= /= %= &amp;= |= ^= &lt;&lt;= &gt;&gt;=</code></td></tr>
+<tr><td>Прочие</td><td><code>?:</code>, <code>,</code>, <code>sizeof</code>, <code>_Alignof</code>, приведение <code>(тип)</code>, <code>&amp;</code> и <code>*</code> для указателей, <code>.</code> и <code>-&gt;</code></td></tr>
+</tbody>
+</table>
+
+<h2>Приоритет (от высшего к низшему)</h2>
+<table>
+<thead><tr><th>#</th><th>Операторы</th><th>Ассоциативность</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><code>() [] . -&gt;</code>, постфиксные <code>++ --</code></td><td>слева направо</td></tr>
+<tr><td>2</td><td>унарные <code>+ - ! ~ ++ -- * &amp;</code>, <code>(тип)</code>, <code>sizeof</code></td><td>справа налево</td></tr>
+<tr><td>3</td><td><code>* / %</code></td><td>слева направо</td></tr>
+<tr><td>4</td><td><code>+ -</code></td><td>слева направо</td></tr>
+<tr><td>5</td><td><code>&lt;&lt; &gt;&gt;</code></td><td>слева направо</td></tr>
+<tr><td>6</td><td><code>&lt; &lt;= &gt; &gt;=</code></td><td>слева направо</td></tr>
+<tr><td>7</td><td><code>== !=</code></td><td>слева направо</td></tr>
+<tr><td>8–10</td><td><code>&amp;</code>, затем <code>^</code>, затем <code>|</code></td><td>слева направо</td></tr>
+<tr><td>11–12</td><td><code>&amp;&amp;</code>, затем <code>||</code></td><td>слева направо</td></tr>
+<tr><td>13</td><td><code>?:</code></td><td>справа налево</td></tr>
+<tr><td>14</td><td>присваивания</td><td>справа налево</td></tr>
+<tr><td>15</td><td><code>,</code></td><td>слева направо</td></tr>
+</tbody>
+</table>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main(void)
+{
+    int a = 17, b = 5;
+    printf("%d / %d = %d, остаток %d\n", a, b, a / b, a % b);  /* 3, 2 */
+    printf("17.0 / 5 = %.2f\n", 17.0 / b);                       /* 3.40 */
+
+    unsigned flags = 0x0Fu;
+    flags &amp;= ~0x02u;            /* сбросить бит 1 */
+    flags |= 0x80u;             /* установить бит 7 */
+    printf("flags = 0x%02X\n", flags);   /* 0x8D */
+
+    int max = (a &gt; b) ? a : b;
+    printf("max = %d\n", max);
+
+    int i = 5;
+    int x = i++;    /* x = 5, i = 6 */
+    int y = ++i;    /* y = 7, i = 7 */
+    printf("x=%d y=%d i=%d\n", x, y, i);
+    return 0;
+}</code></pre></figure>
+<div class="warn">Выражение вида <code>i = i++ + 1;</code> или <code>f(i++, i++)</code> приводит к
+неопределённому поведению: переменная изменяется дважды без упорядочивания между изменениями.</div>
+<div class="note">Целочисленное деление отбрасывает дробную часть в сторону нуля (с C99): <code>-7 / 2 == -3</code>,
+<code>-7 % 2 == -1</code>.</div>
+<nav class="pager" aria-label="Соседние страницы"><a class="prev" href="../getting-started/install-and-compile.html">← Установка и компиляция</a><a class="next" href="../basics/types-and-variables.html">Типы и переменные →</a></nav>
+</main>
+</div>
+<footer class="footer">
+<p>Справочник по языку C — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+Подсветка: <a href="../assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="../assets/fonts/OFL.txt">OFL 1.1</a>).</p>
+</footer>
+<script src="../assets/js/prism.js"></script>
+</body>
+</html>

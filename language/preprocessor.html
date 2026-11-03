@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Препроцессор — Справочник по C</title>
+<meta name="description" content="Препроцессор C: #include, #define, макросы с параметрами, условная компиляция, _Generic и _Static_assert.">
+<link rel="preload" href="../assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="../index.html"><span class="logo">C</span> Справочник по C</a>
+<span class="std">C11 · C17</span>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Разделы">
+<p class="group">Начало</p><ul>
+<li><a href="../index.html">Главная</a></li>
+<li><a href="../getting-started/install-and-compile.html">Установка и компиляция</a></li>
+</ul>
+<p class="group">Основы</p><ul>
+<li><a href="../basics/syntax.html">Синтаксис и операторы</a></li>
+<li><a href="../basics/types-and-variables.html">Типы и переменные</a></li>
+<li><a href="../basics/control-flow.html">Управление потоком</a></li>
+</ul>
+<p class="group">Язык</p><ul>
+<li><a href="../language/functions.html">Функции</a></li>
+<li><a href="../language/arrays-and-strings.html">Массивы и строки</a></li>
+<li><a href="../language/pointers.html">Указатели</a></li>
+<li><a href="../language/memory.html">Память</a></li>
+<li><a href="../language/structs-unions-enums.html">Структуры и enum</a></li>
+<li><a href="../language/preprocessor.html" class="active" aria-current="page">Препроцессор</a></li>
+</ul>
+<p class="group">Библиотека</p><ul>
+<li><a href="../library/stdlib.html">Стандартная библиотека</a></li>
+<li><a href="../library/file-io.html">Работа с файлами</a></li>
+</ul>
+<p class="group">Практика</p><ul>
+<li><a href="../examples/index.html">Примеры программ</a></li>
+<li><a href="../faq.html">FAQ и глоссарий</a></li>
+</ul>
+</nav>
+<main>
+<h1>Препроцессор</h1>
+<p>Препроцессор обрабатывает текст программы до компиляции. Его директивы начинаются с <code>#</code>.
+Результат можно посмотреть командой <code>gcc -E file.c</code>.</p>
+
+<table>
+<thead><tr><th>Директива</th><th>Назначение</th></tr></thead>
+<tbody>
+<tr><td><code>#include &lt;file.h&gt;</code></td><td>вставить системный заголовок</td></tr>
+<tr><td><code>#include "file.h"</code></td><td>вставить заголовок проекта (поиск сначала в каталоге файла)</td></tr>
+<tr><td><code>#define</code>, <code>#undef</code></td><td>определить и отменить макрос</td></tr>
+<tr><td><code>#if</code>, <code>#ifdef</code>, <code>#ifndef</code>, <code>#elif</code>, <code>#else</code>, <code>#endif</code></td><td>условная компиляция</td></tr>
+<tr><td><code>#error</code></td><td>остановить компиляцию с сообщением</td></tr>
+<tr><td><code>#pragma</code></td><td>указание компилятору (например, <code>#pragma once</code> — нестандартное, но распространённое)</td></tr>
+<tr><td><code>#line</code></td><td>изменить номер строки и имя файла в диагностике</td></tr>
+</tbody>
+</table>
+
+<h2>Макросы</h2>
+<p>Параметры и всё тело макроса берут в скобки, иначе приоритет операторов даст неожиданный результат.
+Аргумент макроса может вычисляться несколько раз — не передавайте выражения с побочными эффектами.</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+#define BUFFER_SIZE 256
+#define SQUARE(x)   ((x) * (x))
+#define MAX(a, b)   ((a) &gt; (b) ? (a) : (b))
+#define STR(x)      #x                 /* превращение в строку */
+#define CAT(a, b)   a##b               /* склейка лексем */
+#define LOG(...)    (fprintf(stderr, "[%s:%d] ", __FILE__, __LINE__), \
+                     fprintf(stderr, __VA_ARGS__), fputc('\n', stderr))
+
+/* макрос из нескольких инструкций оборачивают в do { } while (0) */
+#define SWAP_INT(a, b) do { int tmp_ = (a); (a) = (b); (b) = tmp_; } while (0)
+
+int main(void)
+{
+    int CAT(var, 1) = 3, var2 = 8;     /* объявляет var1 */
+    printf("SQUARE(1 + 2) = %d\n", SQUARE(1 + 2));    /* 9, а не 5 */
+    printf("MAX = %d, BUFFER_SIZE = %d\n", MAX(var1, var2), BUFFER_SIZE);
+    printf("STR = %s\n", STR(hello world));
+
+    SWAP_INT(var1, var2);
+    LOG("var1 = %d, var2 = %d", var1, var2);
+    return 0;
+}</code></pre></figure>
+<h2>Условная компиляция</h2>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+#ifndef DEBUG
+#define DEBUG 0
+#endif
+
+#if defined(_WIN32)
+#define PLATFORM "Windows"
+#elif defined(__linux__)
+#define PLATFORM "Linux"
+#elif defined(__APPLE__)
+#define PLATFORM "macOS"
+#else
+#define PLATFORM "неизвестная платформа"
+#endif
+
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ &lt; 201112L
+#error "Нужен компилятор с поддержкой C11 или новее"
+#endif
+
+int main(void)
+{
+    printf("Платформа: %s, __STDC_VERSION__ = %ld\n", PLATFORM, (long)__STDC_VERSION__);
+#if DEBUG
+    printf("отладочная сборка, собрано %s %s\n", __DATE__, __TIME__);
+#endif
+    return 0;
+}</code></pre></figure>
+<p>Значение макроса можно задать при компиляции: <code>gcc -DDEBUG=1 main.c</code>.</p>
+
+<h2>_Generic и _Static_assert (C11)</h2>
+<p><code>_Generic</code> выбирает выражение по типу аргумента во время компиляции — так можно написать
+«перегруженный» макрос. <code>_Static_assert</code> проверяет условие на этапе компиляции.</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;limits.h&gt;
+
+#define TYPE_NAME(x) _Generic((x), \
+    int:     "int",                \
+    long:    "long",               \
+    double:  "double",             \
+    char *:  "char *",             \
+    default: "другой тип")
+
+#define ABS(x) _Generic((x), int: abs_i, long: abs_l, double: abs_d)(x)
+
+static int    abs_i(int v)    { return v &lt; 0 ? -v : v; }
+static long   abs_l(long v)   { return v &lt; 0 ? -v : v; }
+static double abs_d(double v) { return v &lt; 0 ? -v : v; }
+
+_Static_assert(CHAR_BIT == 8, "ожидается 8-битный байт");
+
+int main(void)
+{
+    char text[] = "abc";
+    printf("%s %s %s %s\n", TYPE_NAME(1), TYPE_NAME(1L), TYPE_NAME(1.0), TYPE_NAME(text));
+    printf("%d %ld %.1f\n", ABS(-5), ABS(-7L), ABS(-2.5));
+    return 0;
+}</code></pre></figure>
+<h2>Предопределённые макросы</h2>
+<ul>
+<li><code>__FILE__</code>, <code>__LINE__</code> — имя файла и номер строки;</li>
+<li><code>__DATE__</code>, <code>__TIME__</code> — дата и время компиляции;</li>
+<li><code>__STDC_VERSION__</code> — версия стандарта: <code>201112L</code> для C11, <code>201710L</code> для C17;</li>
+<li><code>__func__</code> — не макрос, а предопределённый идентификатор с именем текущей функции (C99).</li>
+</ul>
+<nav class="pager" aria-label="Соседние страницы"><a class="prev" href="../language/structs-unions-enums.html">← Структуры и enum</a><a class="next" href="../library/stdlib.html">Стандартная библиотека →</a></nav>
+</main>
+</div>
+<footer class="footer">
+<p>Справочник по языку C — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+Подсветка: <a href="../assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="../assets/fonts/OFL.txt">OFL 1.1</a>).</p>
+</footer>
+<script src="../assets/js/prism.js"></script>
+</body>
+</html>

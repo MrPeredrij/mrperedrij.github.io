@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Массивы и строки — Справочник по C</title>
+<meta name="description" content="Массивы в C: объявление, инициализация, многомерные массивы, VLA. Строки с нуль-терминатором и безопасная работа с ними.">
+<link rel="preload" href="../assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="../index.html"><span class="logo">C</span> Справочник по C</a>
+<span class="std">C11 · C17</span>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Разделы">
+<p class="group">Начало</p><ul>
+<li><a href="../index.html">Главная</a></li>
+<li><a href="../getting-started/install-and-compile.html">Установка и компиляция</a></li>
+</ul>
+<p class="group">Основы</p><ul>
+<li><a href="../basics/syntax.html">Синтаксис и операторы</a></li>
+<li><a href="../basics/types-and-variables.html">Типы и переменные</a></li>
+<li><a href="../basics/control-flow.html">Управление потоком</a></li>
+</ul>
+<p class="group">Язык</p><ul>
+<li><a href="../language/functions.html">Функции</a></li>
+<li><a href="../language/arrays-and-strings.html" class="active" aria-current="page">Массивы и строки</a></li>
+<li><a href="../language/pointers.html">Указатели</a></li>
+<li><a href="../language/memory.html">Память</a></li>
+<li><a href="../language/structs-unions-enums.html">Структуры и enum</a></li>
+<li><a href="../language/preprocessor.html">Препроцессор</a></li>
+</ul>
+<p class="group">Библиотека</p><ul>
+<li><a href="../library/stdlib.html">Стандартная библиотека</a></li>
+<li><a href="../library/file-io.html">Работа с файлами</a></li>
+</ul>
+<p class="group">Практика</p><ul>
+<li><a href="../examples/index.html">Примеры программ</a></li>
+<li><a href="../faq.html">FAQ и глоссарий</a></li>
+</ul>
+</nav>
+<main>
+<h1>Массивы и строки</h1>
+<h2>Массивы</h2>
+<p>Массив — непрерывный блок однотипных элементов. Индексы начинаются с 0, выход за границы не проверяется
+и приводит к неопределённому поведению.</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+#define COUNT(a) (sizeof(a) / sizeof((a)[0]))
+
+int main(void)
+{
+    int primes[] = { 2, 3, 5, 7, 11 };          /* размер выводится: 5 */
+    double zeros[8] = { 0 };                    /* все элементы = 0 */
+    int sparse[10] = { [2] = 20, [7] = 70 };    /* назначенные инициализаторы (C99) */
+
+    for (size_t i = 0; i &lt; COUNT(primes); i++)
+        printf("%d ", primes[i]);
+    printf("\nzeros[7] = %.1f, sparse[7] = %d\n", zeros[7], sparse[7]);
+
+    int matrix[2][3] = { { 1, 2, 3 }, { 4, 5, 6 } };
+    for (int r = 0; r &lt; 2; r++) {
+        for (int col = 0; col &lt; 3; col++)
+            printf("%3d", matrix[r][col]);
+        putchar('\n');
+    }
+    return 0;
+}</code></pre></figure>
+<h2>Массивы и функции</h2>
+<p>При передаче в функцию массив превращается в указатель на первый элемент, и <code>sizeof</code> внутри функции
+вернёт размер указателя. Поэтому длину передают отдельным параметром.</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+static void scale(double *v, size_t n, double k)
+{
+    for (size_t i = 0; i &lt; n; i++)
+        v[i] *= k;
+}
+
+/* параметр — массив переменной длины (VLA, C99; в C11 поддержка необязательна) */
+static double trace(size_t n, double m[n][n])
+{
+    double t = 0;
+    for (size_t i = 0; i &lt; n; i++)
+        t += m[i][i];
+    return t;
+}
+
+int main(void)
+{
+    double v[] = { 1.0, 2.0, 3.0 };
+    scale(v, 3, 2.5);
+    printf("%.1f %.1f %.1f\n", v[0], v[1], v[2]);
+
+    double m[2][2] = { { 1, 2 }, { 3, 4 } };
+    printf("trace = %.1f\n", trace(2, m));
+    return 0;
+}</code></pre></figure>
+<h2>Строки</h2>
+<p>Строка в C — массив <code>char</code>, заканчивающийся нулевым символом <code>'\0'</code>. Строковый литерал
+<code>"кот"</code> в UTF-8 занимает 6 байт плюс 1 байт на <code>'\0'</code>; <code>strlen</code> считает
+<b>байты</b>, а не символы.</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;ctype.h&gt;
+
+int main(void)
+{
+    char word[] = "hello";            /* изменяемый массив из 6 байт */
+    const char *lit = "world";        /* литерал менять нельзя */
+
+    word[0] = (char)toupper((unsigned char)word[0]);
+    printf("%s, %s! strlen = %zu, sizeof = %zu\n",
+           word, lit, strlen(word), sizeof word);
+
+    char buf[32];
+    /* snprintf никогда не выходит за границу буфера */
+    int need = snprintf(buf, sizeof buf, "%s-%s-%d", word, lit, 2026);
+    printf("buf = \"%s\" (%d символов)\n", buf, need);
+
+    if (strcmp(word, "Hello") == 0)
+        puts("строки равны");
+
+    const char *found = strstr(buf, "world");
+    if (found != NULL)
+        printf("позиция world: %td\n", found - buf);
+    return 0;
+}</code></pre></figure>
+<h2>Разбор строки на слова</h2>
+<p><code>strtok</code> изменяет исходную строку (заменяет разделители на <code>'\0'</code>), поэтому ей нельзя
+передавать строковый литерал.</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+int main(void)
+{
+    char line[] = "gcc -std=c17 -Wall -Wextra main.c";
+    int n = 0;
+    for (char *tok = strtok(line, " "); tok != NULL; tok = strtok(NULL, " "))
+        printf("[%d] %s\n", n++, tok);
+    return 0;
+}</code></pre></figure>
+<div class="warn">Функция <code>gets</code> удалена из стандарта в C11. Для чтения строки используйте
+<code>fgets(buf, sizeof buf, stdin)</code>. Функции <code>strcpy</code> и <code>strcat</code> не проверяют размер
+приёмника — предпочтительнее <code>snprintf</code> или ручная проверка длины.</div>
+<nav class="pager" aria-label="Соседние страницы"><a class="prev" href="../language/functions.html">← Функции</a><a class="next" href="../language/pointers.html">Указатели →</a></nav>
+</main>
+</div>
+<footer class="footer">
+<p>Справочник по языку C — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+Подсветка: <a href="../assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="../assets/fonts/OFL.txt">OFL 1.1</a>).</p>
+</footer>
+<script src="../assets/js/prism.js"></script>
+</body>
+</html>
