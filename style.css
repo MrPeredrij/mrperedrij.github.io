@@ -50,10 +50,7 @@ a:hover { color: var(--accent-2); }
 }
 .brand { color: #fff; text-decoration: none; font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; gap: .6rem; }
 .brand:hover { color: #cfe3ff; }
-.logo {
-  display: inline-grid; place-items: center; width: 2rem; height: 2rem;
-  background: #00599c; border-radius: 50%; font-family: var(--mono); font-weight: 700;
-}
+.logo { display: block; width: 2rem; height: 2rem; }
 .std { font-family: var(--mono); font-size: .85rem; color: #b8c4d9; }
 
 .layout { display: grid; grid-template-columns: 250px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
