@@ -8,6 +8,8 @@
 <link rel="preload" href="assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="style.css">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/favicon.ico" sizes="48x48 32x32 16x16">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png" sizes="180x180">
 </head>
 <body>
 <header class="topbar">
@@ -69,9 +71,10 @@
 <img class="hero" src="image.jpg" alt="Баннер: Записки embedded-разработчика" width="1600" height="600">
 <h1>Записки embedded-разработчика</h1>
 
-<p class="lead">Это уже не только справочник по C. Здесь собраны четыре темы, которые нужны
-embedded-разработчику: язык <b>C</b> (C11/C17), введение в <b>C++17</b>, <b>общие вопросы</b>
-(алгоритмы, структуры данных, FAQ) и задел под <b>программирование микроконтроллеров</b>.</p>
+<p class="lead">Краткие записки и справочные материалы для embedded-разработчика.
+На сайте собраны разделы по языку <b>C</b> (C11/C17), введение в <b>C++17</b>,
+общие темы — алгоритмы и структуры данных — и программирование микроконтроллеров
+(раздел пока в разработке).</p>
 <p>Примеры на C компилируются командой <code>gcc -std=c17 -Wall -Wextra</code>,
 примеры на C++ — командой <code>g++ -std=c++17 -Wall -Wextra</code> без предупреждений.</p>
 
@@ -144,17 +147,16 @@ embedded-разработчику: язык <b>C</b> (C11/C17), введение
 </section>
 
 <h2>О сайте</h2>
-<p>Сайт сделан как индивидуальный проект к лабораторной работе 2.1 «Настройка CDN для статического веб-сайта».
-Это набор однотипных HTML-страниц с общей таблицей стилей <code>style.css</code>, локальным подсветчиком
-синтаксиса (<a href="assets/js/PRISM-LICENSE.txt">Prism, лицензия MIT</a>) и локальным шрифтом JetBrains Mono
-(<a href="assets/fonts/OFL.txt">SIL Open Font License</a>). Внешних CDN-зависимостей нет, поэтому весь
-трафик идёт с Origin-сервера и удобно анализируется в Cloudflare: HTML-страницы дают высокий Cache Hit Ratio,
-а шрифты, CSS и JS подходят для долгого TTL.</p>
+<p>Сайт сделан как мини-проект: набор однотипных HTML-страниц с общей таблицей стилей <code>style.css</code>,
+локальным подсветчиком синтаксиса (<a href="assets/js/PRISM-LICENSE.txt">Prism, лицензия MIT</a>)
+и локальным шрифтом JetBrains Mono (<a href="assets/fonts/OFL.txt">SIL Open Font License</a>).
+Внешних CDN-зависимостей нет, поэтому весь трафик идёт с Origin-сервера и удобно анализируется
+в Cloudflare: HTML-страницы дают высокий Cache Hit Ratio, а шрифты, CSS и JS подходят для долгого TTL.</p>
 <nav class="pager" aria-label="Соседние страницы"><a class="next" href="c/index.html">Обзор языка C →</a></nav>
 </main>
 </div>
 <footer class="footer">
-<p>Записки embedded-разработчика — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+<p>Записки embedded-разработчика — мини-проект.
 Подсветка: <a href="assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="assets/fonts/OFL.txt">OFL 1.1</a>).</p>
 </footer>
 <script src="assets/js/prism.js"></script>
