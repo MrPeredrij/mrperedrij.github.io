@@ -3,41 +3,40 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Справочник по языку C — Справочник по C</title>
-<meta name="description" content="Справочник по языкам C (C11/C17) и C++17: синтаксис, типы, указатели, классы, базовые алгоритмы и примеры.">
+<title>Записки embedded-разработчика</title>
+<meta name="description" content="Записки embedded-разработчика: язык C, введение в C++17, базовые алгоритмы и программирование микроконтроллеров.">
 <link rel="preload" href="assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="style.css">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 </head>
 <body>
 <header class="topbar">
-<a class="brand" href="index.html"><span class="logo">C</span> Справочник по C</a>
+<a class="brand" href="index.html"><span class="logo">З</span> Записки embedded-разработчика</a>
 <span class="std">C11 · C17 · C++17</span>
 </header>
 <div class="layout">
 <nav class="sidebar" aria-label="Разделы">
-<p class="group">Начало</p><ul>
-<li><a href="index.html" class="active" aria-current="page">Главная</a></li>
+<ul class="nav-home"><li><a href="index.html" class="active" aria-current="page">Главная</a></li></ul>
+<details>
+<summary>C</summary><ul>
+<li><a href="c/index.html">Обзор языка C</a></li>
 <li><a href="getting-started/install-and-compile.html">Установка и компиляция</a></li>
-</ul>
-<p class="group">Основы</p><ul>
 <li><a href="basics/syntax.html">Синтаксис и операторы</a></li>
 <li><a href="basics/types-and-variables.html">Типы и переменные</a></li>
 <li><a href="basics/control-flow.html">Управление потоком</a></li>
-</ul>
-<p class="group">Язык</p><ul>
 <li><a href="language/functions.html">Функции</a></li>
 <li><a href="language/arrays-and-strings.html">Массивы и строки</a></li>
 <li><a href="language/pointers.html">Указатели</a></li>
 <li><a href="language/memory.html">Память</a></li>
 <li><a href="language/structs-unions-enums.html">Структуры и enum</a></li>
 <li><a href="language/preprocessor.html">Препроцессор</a></li>
-</ul>
-<p class="group">Библиотека</p><ul>
 <li><a href="library/stdlib.html">Стандартная библиотека</a></li>
 <li><a href="library/file-io.html">Работа с файлами</a></li>
-</ul>
-<p class="group">C++</p><ul>
+<li><a href="examples/index.html">Примеры программ</a></li>
+</ul></details>
+<details>
+<summary>C++</summary><ul>
+<li><a href="cpp/index.html">Обзор C++</a></li>
 <li><a href="cpp/differences.html">Отличия от C</a></li>
 <li><a href="cpp/references.html">Ссылки</a></li>
 <li><a href="cpp/namespaces.html">Пространства имён</a></li>
@@ -49,59 +48,39 @@
 <li><a href="cpp/new-delete.html">new и delete</a></li>
 <li><a href="cpp/exceptions.html">Исключения</a></li>
 <li><a href="cpp/const-constexpr.html">const и constexpr</a></li>
-</ul>
-<p class="group">Алгоритмы</p><ul>
+</ul></details>
+<details>
+<summary>Общие темы</summary><ul>
+<li><a href="algorithms/index.html">Обзор раздела</a></li>
 <li><a href="algorithms/complexity.html">Сложность (O-нотация)</a></li>
 <li><a href="algorithms/search.html">Поиск</a></li>
 <li><a href="algorithms/sorting.html">Сортировка</a></li>
 <li><a href="algorithms/recursion.html">Рекурсия и НОД</a></li>
 <li><a href="algorithms/primes.html">Простые числа</a></li>
 <li><a href="algorithms/data-structures.html">Структуры данных</a></li>
-</ul>
-<p class="group">Микроконтроллеры</p><ul>
-<li><a href="mcu/index.html">Раздел (WIP)</a></li>
-</ul>
-<p class="group">Практика</p><ul>
-<li><a href="examples/index.html">Примеры программ</a></li>
 <li><a href="faq.html">FAQ и глоссарий</a></li>
-</ul>
+</ul></details>
+<details>
+<summary>Микроконтроллеры</summary><ul>
+<li><a href="mcu/index.html">Раздел (WIP)</a></li>
+</ul></details>
 </nav>
 <main>
-<img class="hero" src="image.jpg" alt="Баннер справочника по языку C" width="1600" height="600">
-<h1>Справочник по языку C</h1>
-<p class="lead">Краткий практический справочник по языку программирования C по стандартам <b>C11</b> и <b>C17</b>,
-с разделами по <b>C++17</b> и базовым алгоритмам.
-Примеры на C компилируются командой <code>gcc -std=c17 -Wall -Wextra</code>,
+<img class="hero" src="image.jpg" alt="Баннер: Записки embedded-разработчика" width="1600" height="600">
+<h1>Записки embedded-разработчика</h1>
+
+<p class="lead">Это уже не только справочник по C. Здесь собраны четыре темы, которые нужны
+embedded-разработчику: язык <b>C</b> (C11/C17), введение в <b>C++17</b>, <b>общие вопросы</b>
+(алгоритмы, структуры данных, FAQ) и задел под <b>программирование микроконтроллеров</b>.</p>
+<p>Примеры на C компилируются командой <code>gcc -std=c17 -Wall -Wextra</code>,
 примеры на C++ — командой <code>g++ -std=c++17 -Wall -Wextra</code> без предупреждений.</p>
 
-<h2>Что такое C</h2>
-<p>C — компилируемый язык общего назначения, созданный Деннисом Ритчи в Bell Labs в 1972 году для написания
-операционной системы UNIX. Он даёт прямой доступ к памяти через указатели, почти не имеет скрытых
-затрат во время выполнения и поэтому до сих пор используется в ядрах ОС, встраиваемых системах,
-драйверах, интерпретаторах и базах данных.</p>
-
-<table>
-<thead><tr><th>Стандарт</th><th>Год</th><th>Главные нововведения</th></tr></thead>
-<tbody>
-<tr><td>K&amp;R C</td><td>1978</td><td>Язык из книги «The C Programming Language»</td></tr>
-<tr><td>C89 / C90</td><td>1989–1990</td><td>Первый стандарт ANSI/ISO, прототипы функций</td></tr>
-<tr><td>C99</td><td>1999</td><td><code>//</code>-комментарии, <code>&lt;stdint.h&gt;</code>, <code>_Bool</code>, VLA, объявления в <code>for</code></td></tr>
-<tr><td>C11</td><td>2011</td><td><code>_Generic</code>, <code>_Static_assert</code>, <code>&lt;threads.h&gt;</code>, атомарные типы, анонимные структуры</td></tr>
-<tr><td>C17</td><td>2018</td><td>Исправления ошибок C11 без новых возможностей</td></tr>
-<tr><td>C23</td><td>2024</td><td><code>nullptr</code>, <code>constexpr</code>, <code>bool</code> как ключевое слово, <code>typeof</code></td></tr>
-</tbody>
-</table>
-
-<h2>Первая программа</h2>
-<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
-
-int main(void)
-{
-    printf("Привет, мир!\n");
-    return 0;
-}</code></pre></figure>
-<h2>Разделы справочника</h2>
+<section class="hub" id="c">
+<h2>C</h2>
+<p>Синтаксис, типы, указатели, память, стандартная библиотека и законченные примеры.
+Начните с <a href="c/index.html">обзора языка C</a> или сразу откройте нужную тему.</p>
 <div class="cards">
+<a class="card" href="c/index.html"><b>Обзор языка C</b><span>Что такое C, стандарты, первая программа</span></a>
 <a class="card" href="getting-started/install-and-compile.html"><b>Установка и компиляция</b><span>GCC, Clang, MSVC, флаги компилятора</span></a>
 <a class="card" href="basics/syntax.html"><b>Синтаксис и операторы</b><span>Структура программы, выражения, приоритеты</span></a>
 <a class="card" href="basics/types-and-variables.html"><b>Типы и переменные</b><span>Целые, вещественные, stdint.h, константы</span></a>
@@ -115,12 +94,16 @@ int main(void)
 <a class="card" href="library/stdlib.html"><b>Стандартная библиотека</b><span>stdio, string, stdlib, math, time</span></a>
 <a class="card" href="library/file-io.html"><b>Работа с файлами</b><span>fopen, fread, обработка ошибок</span></a>
 <a class="card" href="examples/index.html"><b>Примеры программ</b><span>Законченные программы целиком</span></a>
-<a class="card" href="faq.html"><b>FAQ и глоссарий</b><span>Частые вопросы и термины</span></a>
 </div>
+</section>
 
-<h2>Язык C++</h2>
-<p>Обзор возможностей C++17, которых нет в C. Стандартная библиотека шаблонов (STL) будет добавлена отдельным разделом позже.</p>
+<section class="hub" id="cpp">
+<h2>C++</h2>
+<p>Возможности C++17, которых нет в C: ссылки, классы, наследование, шаблоны, исключения.
+Обзор раздела — на странице <a href="cpp/index.html">Язык C++</a>.
+Стандартная библиотека шаблонов (STL) будет добавлена позже.</p>
 <div class="cards">
+<a class="card" href="cpp/index.html"><b>Обзор C++</b><span>С чего начать и как устроен раздел</span></a>
 <a class="card" href="cpp/differences.html"><b>Отличия от C</b><span>Ключевые слова, типы, компиляция g++</span></a>
 <a class="card" href="cpp/references.html"><b>Ссылки</b><span>lvalue-ссылки, const, отличие от указателей</span></a>
 <a class="card" href="cpp/namespaces.html"><b>Пространства имён</b><span>namespace, using, анонимные пространства</span></a>
@@ -133,22 +116,32 @@ int main(void)
 <a class="card" href="cpp/exceptions.html"><b>Исключения</b><span>throw, try, catch, раскрутка стека</span></a>
 <a class="card" href="cpp/const-constexpr.html"><b>const и constexpr</b><span>Константность и вычисления на этапе компиляции</span></a>
 </div>
+</section>
 
-<h2>Базовые алгоритмы</h2>
-<p>Классические алгоритмы на C: оценка сложности, поиск, сортировки, рекурсия и простые структуры данных.</p>
+<section class="hub" id="general">
+<h2>Общие темы</h2>
+<p>То, что не привязано к одному языку: оценка сложности, поиск и сортировки, рекурсия,
+простые структуры данных и FAQ. Полный обзор — в разделе <a href="algorithms/index.html">Общие темы</a>.</p>
 <div class="cards">
+<a class="card" href="algorithms/index.html"><b>Обзор раздела</b><span>Какие алгоритмы разобраны и зачем</span></a>
 <a class="card" href="algorithms/complexity.html"><b>Сложность алгоритмов</b><span>O-нотация, типичные классы сложности</span></a>
 <a class="card" href="algorithms/search.html"><b>Поиск</b><span>Линейный и двоичный поиск</span></a>
 <a class="card" href="algorithms/sorting.html"><b>Сортировка</b><span>Пузырёк, вставки, выбором, быстрая, слиянием</span></a>
 <a class="card" href="algorithms/recursion.html"><b>Рекурсия и НОД</b><span>Базовый случай, алгоритм Евклида</span></a>
 <a class="card" href="algorithms/primes.html"><b>Простые числа</b><span>Перебор делителей и решето Эратосфена</span></a>
 <a class="card" href="algorithms/data-structures.html"><b>Структуры данных</b><span>Стек, очередь и связный список на C</span></a>
+<a class="card" href="faq.html"><b>FAQ и глоссарий</b><span>Частые вопросы и термины</span></a>
 </div>
+</section>
 
-<h2>Программирование микроконтроллеров</h2>
+<section class="hub" id="mcu">
+<h2>Микроконтроллеры</h2>
+<p>Раздел ещё готовится. Пока здесь заглушка; позже появятся материалы по периферии,
+прерываниям и типичным приёмам работы с железом.</p>
 <div class="cards">
 <a class="card" href="mcu/index.html"><b>Раздел в разработке / WIP</b><span>Заготовка под будущие материалы по МК</span></a>
 </div>
+</section>
 
 <h2>О сайте</h2>
 <p>Сайт сделан как индивидуальный проект к лабораторной работе 2.1 «Настройка CDN для статического веб-сайта».
@@ -157,11 +150,11 @@ int main(void)
 (<a href="assets/fonts/OFL.txt">SIL Open Font License</a>). Внешних CDN-зависимостей нет, поэтому весь
 трафик идёт с Origin-сервера и удобно анализируется в Cloudflare: HTML-страницы дают высокий Cache Hit Ratio,
 а шрифты, CSS и JS подходят для долгого TTL.</p>
-<nav class="pager" aria-label="Соседние страницы"><a class="next" href="getting-started/install-and-compile.html">Установка и компиляция →</a></nav>
+<nav class="pager" aria-label="Соседние страницы"><a class="next" href="c/index.html">Обзор языка C →</a></nav>
 </main>
 </div>
 <footer class="footer">
-<p>Справочник по языкам C и C++ — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+<p>Записки embedded-разработчика — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
 Подсветка: <a href="assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="assets/fonts/OFL.txt">OFL 1.1</a>).</p>
 </footer>
 <script src="assets/js/prism.js"></script>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Язык C++ — Записки embedded-разработчика</title>
+<meta name="description" content="Обзор раздела C++17: чем язык отличается от C и какие темы разобраны. Без STL.">
+<link rel="preload" href="../assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="../index.html"><span class="logo">З</span> Записки embedded-разработчика</a>
+<span class="std">C11 · C17 · C++17</span>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Разделы">
+<ul class="nav-home"><li><a href="../index.html">Главная</a></li></ul>
+<details>
+<summary>C</summary><ul>
+<li><a href="../c/index.html">Обзор языка C</a></li>
+<li><a href="../getting-started/install-and-compile.html">Установка и компиляция</a></li>
+<li><a href="../basics/syntax.html">Синтаксис и операторы</a></li>
+<li><a href="../basics/types-and-variables.html">Типы и переменные</a></li>
+<li><a href="../basics/control-flow.html">Управление потоком</a></li>
+<li><a href="../language/functions.html">Функции</a></li>
+<li><a href="../language/arrays-and-strings.html">Массивы и строки</a></li>
+<li><a href="../language/pointers.html">Указатели</a></li>
+<li><a href="../language/memory.html">Память</a></li>
+<li><a href="../language/structs-unions-enums.html">Структуры и enum</a></li>
+<li><a href="../language/preprocessor.html">Препроцессор</a></li>
+<li><a href="../library/stdlib.html">Стандартная библиотека</a></li>
+<li><a href="../library/file-io.html">Работа с файлами</a></li>
+<li><a href="../examples/index.html">Примеры программ</a></li>
+</ul></details>
+<details open>
+<summary>C++</summary><ul>
+<li><a href="../cpp/index.html" class="active" aria-current="page">Обзор C++</a></li>
+<li><a href="../cpp/differences.html">Отличия от C</a></li>
+<li><a href="../cpp/references.html">Ссылки</a></li>
+<li><a href="../cpp/namespaces.html">Пространства имён</a></li>
+<li><a href="../cpp/overloading.html">Перегрузка функций</a></li>
+<li><a href="../cpp/classes.html">Классы и объекты</a></li>
+<li><a href="../cpp/inheritance.html">Наследование</a></li>
+<li><a href="../cpp/operators.html">Перегрузка операторов</a></li>
+<li><a href="../cpp/templates.html">Шаблоны</a></li>
+<li><a href="../cpp/new-delete.html">new и delete</a></li>
+<li><a href="../cpp/exceptions.html">Исключения</a></li>
+<li><a href="../cpp/const-constexpr.html">const и constexpr</a></li>
+</ul></details>
+<details>
+<summary>Общие темы</summary><ul>
+<li><a href="../algorithms/index.html">Обзор раздела</a></li>
+<li><a href="../algorithms/complexity.html">Сложность (O-нотация)</a></li>
+<li><a href="../algorithms/search.html">Поиск</a></li>
+<li><a href="../algorithms/sorting.html">Сортировка</a></li>
+<li><a href="../algorithms/recursion.html">Рекурсия и НОД</a></li>
+<li><a href="../algorithms/primes.html">Простые числа</a></li>
+<li><a href="../algorithms/data-structures.html">Структуры данных</a></li>
+<li><a href="../faq.html">FAQ и глоссарий</a></li>
+</ul></details>
+<details>
+<summary>Микроконтроллеры</summary><ul>
+<li><a href="../mcu/index.html">Раздел (WIP)</a></li>
+</ul></details>
+</nav>
+<main>
+<h1>Язык C++</h1>
+<p class="lead">Краткое введение в C++17 для тех, кто уже знает C. Раздел разбирает возможности языка,
+которых в C нет: ссылки, пространства имён, классы, наследование, шаблоны, исключения
+и вычисления на этапе компиляции.</p>
+<p>Примеры собираются командой <code>g++ -std=c++17 -Wall -Wextra</code>.
+Стандартная библиотека шаблонов (контейнеры вроде <code>std::vector</code>, итераторы,
+<code>&lt;algorithm&gt;</code>) пока не входит в справочник — отдельный раздел появится позже.</p>
+<p>Удобная точка входа — страница <a href="../cpp/differences.html">Отличия от C</a>,
+дальше темы можно читать по порядку или выбирать по меню слева.</p>
+
+<h2>Страницы раздела</h2>
+<div class="cards">
+<a class="card" href="../cpp/differences.html"><b>Отличия от C</b><span>Ключевые слова, типы, компиляция g++</span></a>
+<a class="card" href="../cpp/references.html"><b>Ссылки</b><span>lvalue-ссылки, const, отличие от указателей</span></a>
+<a class="card" href="../cpp/namespaces.html"><b>Пространства имён</b><span>namespace, using, анонимные пространства</span></a>
+<a class="card" href="../cpp/overloading.html"><b>Перегрузка функций</b><span>Одинаковые имена, аргументы по умолчанию</span></a>
+<a class="card" href="../cpp/classes.html"><b>Классы и объекты</b><span>Конструкторы, деструкторы, доступ</span></a>
+<a class="card" href="../cpp/inheritance.html"><b>Наследование</b><span>virtual, полиморфизм, абстрактные классы</span></a>
+<a class="card" href="../cpp/operators.html"><b>Перегрузка операторов</b><span>operator+, сравнение, присваивание</span></a>
+<a class="card" href="../cpp/templates.html"><b>Шаблоны</b><span>Функции и классы с параметром-типом</span></a>
+<a class="card" href="../cpp/new-delete.html"><b>new и delete</b><span>Динамические объекты и массивы</span></a>
+<a class="card" href="../cpp/exceptions.html"><b>Исключения</b><span>throw, try, catch, раскрутка стека</span></a>
+<a class="card" href="../cpp/const-constexpr.html"><b>const и constexpr</b><span>Константность и вычисления на этапе компиляции</span></a>
+</div>
+<div class="note">Компилируйте C как C, а C++ как C++. Файл с классами, ссылками или <code>new</code>
+нельзя собрать командой <code>gcc -std=c17</code>. Как поставить <code>g++</code>, написано
+в разделе <a href="../getting-started/install-and-compile.html">Установка и компиляция</a>.</div>
+<nav class="pager" aria-label="Соседние страницы"><a class="prev" href="../examples/index.html">← Примеры программ</a><a class="next" href="../cpp/differences.html">Отличия от C →</a></nav>
+</main>
+</div>
+<footer class="footer">
+<p>Записки embedded-разработчика — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+Подсветка: <a href="../assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="../assets/fonts/OFL.txt">OFL 1.1</a>).</p>
+</footer>
+<script src="../assets/js/prism.js"></script>
+</body>
+</html>
