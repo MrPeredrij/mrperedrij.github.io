@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Поиск — Справочник по C</title>
+<meta name="description" content="Линейный и двоичный поиск в массиве: реализация на C, условия применимости и сложность.">
+<link rel="preload" href="../assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="../index.html"><span class="logo">C</span> Справочник по C</a>
+<span class="std">C11 · C17 · C++17</span>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Разделы">
+<p class="group">Начало</p><ul>
+<li><a href="../index.html">Главная</a></li>
+<li><a href="../getting-started/install-and-compile.html">Установка и компиляция</a></li>
+</ul>
+<p class="group">Основы</p><ul>
+<li><a href="../basics/syntax.html">Синтаксис и операторы</a></li>
+<li><a href="../basics/types-and-variables.html">Типы и переменные</a></li>
+<li><a href="../basics/control-flow.html">Управление потоком</a></li>
+</ul>
+<p class="group">Язык</p><ul>
+<li><a href="../language/functions.html">Функции</a></li>
+<li><a href="../language/arrays-and-strings.html">Массивы и строки</a></li>
+<li><a href="../language/pointers.html">Указатели</a></li>
+<li><a href="../language/memory.html">Память</a></li>
+<li><a href="../language/structs-unions-enums.html">Структуры и enum</a></li>
+<li><a href="../language/preprocessor.html">Препроцессор</a></li>
+</ul>
+<p class="group">Библиотека</p><ul>
+<li><a href="../library/stdlib.html">Стандартная библиотека</a></li>
+<li><a href="../library/file-io.html">Работа с файлами</a></li>
+</ul>
+<p class="group">C++</p><ul>
+<li><a href="../cpp/differences.html">Отличия от C</a></li>
+<li><a href="../cpp/references.html">Ссылки</a></li>
+<li><a href="../cpp/namespaces.html">Пространства имён</a></li>
+<li><a href="../cpp/overloading.html">Перегрузка функций</a></li>
+<li><a href="../cpp/classes.html">Классы и объекты</a></li>
+<li><a href="../cpp/inheritance.html">Наследование</a></li>
+<li><a href="../cpp/operators.html">Перегрузка операторов</a></li>
+<li><a href="../cpp/templates.html">Шаблоны</a></li>
+<li><a href="../cpp/new-delete.html">new и delete</a></li>
+<li><a href="../cpp/exceptions.html">Исключения</a></li>
+<li><a href="../cpp/const-constexpr.html">const и constexpr</a></li>
+</ul>
+<p class="group">Алгоритмы</p><ul>
+<li><a href="../algorithms/complexity.html">Сложность (O-нотация)</a></li>
+<li><a href="../algorithms/search.html" class="active" aria-current="page">Поиск</a></li>
+<li><a href="../algorithms/sorting.html">Сортировка</a></li>
+<li><a href="../algorithms/recursion.html">Рекурсия и НОД</a></li>
+<li><a href="../algorithms/primes.html">Простые числа</a></li>
+<li><a href="../algorithms/data-structures.html">Структуры данных</a></li>
+</ul>
+<p class="group">Микроконтроллеры</p><ul>
+<li><a href="../mcu/index.html">Раздел (WIP)</a></li>
+</ul>
+<p class="group">Практика</p><ul>
+<li><a href="../examples/index.html">Примеры программ</a></li>
+<li><a href="../faq.html">FAQ и глоссарий</a></li>
+</ul>
+</nav>
+<main>
+<h1>Поиск</h1>
+<p>Задача: найти в массиве элемент с заданным значением (или сообщить, что его нет).
+Два базовых способа — просмотреть все элементы подряд или, если массив уже отсортирован,
+повторно делить диапазон пополам.</p>
+
+<h2>Линейный поиск</h2>
+<p>Идём слева направо, пока не найдём ключ. Работает на любых данных, ничего не предполагает о порядке.
+Сложность <code>O(n)</code> по времени, <code>O(1)</code> по памяти. Если нужный элемент первый,
+хватит одного сравнения; если его нет — просмотрим весь массив.</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+static int linear_search(const int *a, int n, int key)
+{
+    for (int i = 0; i &lt; n; i++) {
+        if (a[i] == key)
+            return i;
+    }
+    return -1;
+}
+
+int main(void)
+{
+    int a[] = { 9, 1, 4, 7, 3, 8 };
+    int n = (int)(sizeof a / sizeof a[0]);
+    printf("7 на позиции %d\n", linear_search(a, n, 7));
+    printf("5 на позиции %d (нет в массиве)\n", linear_search(a, n, 5));
+    return 0;
+}</code></pre></figure>
+<h2>Двоичный поиск</h2>
+<p>Массив должен быть <b>отсортирован</b> (здесь — по неубыванию). Сравниваем ключ со средним элементом:
+либо нашли, либо отбрасываем половину диапазона. За <code>O(log n)</code> шагов диапазон сужается до пустого
+или до найденного индекса.</p>
+<p>Важно аккуратно считать середину: <code>mid = lo + (hi - lo) / 2</code>, а не <code>(lo + hi) / 2</code>,
+чтобы сумма индексов не переполнила <code>int</code> на больших массивах.</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+static int binary_search(const int *a, int n, int key)
+{
+    int lo = 0;
+    int hi = n - 1;
+    while (lo &lt;= hi) {
+        int mid = lo + (hi - lo) / 2;
+        if (a[mid] == key)
+            return mid;
+        if (a[mid] &lt; key)
+            lo = mid + 1;
+        else
+            hi = mid - 1;
+    }
+    return -1;
+}
+
+int main(void)
+{
+    int a[] = { 1, 3, 4, 7, 8, 9, 15, 22, 31 };
+    int n = (int)(sizeof a / sizeof a[0]);
+    printf("8 на позиции %d\n", binary_search(a, n, 8));
+    printf("10 на позиции %d\n", binary_search(a, n, 10));
+    printf("1 на позиции %d\n", binary_search(a, n, 1));
+    printf("31 на позиции %d\n", binary_search(a, n, 31));
+    return 0;
+}</code></pre></figure>
+<table>
+<thead><tr><th></th><th>Линейный</th><th>Двоичный</th></tr></thead>
+<tbody>
+<tr><td>Предусловие</td><td>нет</td><td>массив отсортирован</td></tr>
+<tr><td>Время (худший случай)</td><td><code>O(n)</code></td><td><code>O(log n)</code></td></tr>
+<tr><td>Память</td><td><code>O(1)</code></td><td><code>O(1)</code> в итеративной версии</td></tr>
+<tr><td>Когда выбирать</td><td>короткий или неотсортированный массив</td><td>большой отсортированный массив, много запросов</td></tr>
+</tbody>
+</table>
+<div class="warn">Двоичный поиск на неотсортированных данных даёт неверный ответ, а не «просто медленнее».
+Сначала убедитесь в порядке элементов или отсортируйте массив (это уже <code>O(n log n)</code>).</div>
+<div class="note">Рекурсивная запись двоичного поиска выглядит коротко, но итеративная не расходует стек
+и обычно предпочтительнее. Если нужны все вхождения ключа, после нахождения элемента доходят влево и вправо
+по равным соседям либо ищут левую и правую границы отдельно.</div>
+<nav class="pager" aria-label="Соседние страницы"><a class="prev" href="../algorithms/complexity.html">← Сложность (O-нотация)</a><a class="next" href="../algorithms/sorting.html">Сортировка →</a></nav>
+</main>
+</div>
+<footer class="footer">
+<p>Справочник по языкам C и C++ — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+Подсветка: <a href="../assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="../assets/fonts/OFL.txt">OFL 1.1</a>).</p>
+</footer>
+<script src="../assets/js/prism.js"></script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Рекурсия и НОД — Справочник по C</title>
+<meta name="description" content="Рекурсия: базовый случай и глубина стека. Алгоритм Евклида для НОД и НОК. Реализация на C.">
+<link rel="preload" href="../assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="../index.html"><span class="logo">C</span> Справочник по C</a>
+<span class="std">C11 · C17 · C++17</span>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Разделы">
+<p class="group">Начало</p><ul>
+<li><a href="../index.html">Главная</a></li>
+<li><a href="../getting-started/install-and-compile.html">Установка и компиляция</a></li>
+</ul>
+<p class="group">Основы</p><ul>
+<li><a href="../basics/syntax.html">Синтаксис и операторы</a></li>
+<li><a href="../basics/types-and-variables.html">Типы и переменные</a></li>
+<li><a href="../basics/control-flow.html">Управление потоком</a></li>
+</ul>
+<p class="group">Язык</p><ul>
+<li><a href="../language/functions.html">Функции</a></li>
+<li><a href="../language/arrays-and-strings.html">Массивы и строки</a></li>
+<li><a href="../language/pointers.html">Указатели</a></li>
+<li><a href="../language/memory.html">Память</a></li>
+<li><a href="../language/structs-unions-enums.html">Структуры и enum</a></li>
+<li><a href="../language/preprocessor.html">Препроцессор</a></li>
+</ul>
+<p class="group">Библиотека</p><ul>
+<li><a href="../library/stdlib.html">Стандартная библиотека</a></li>
+<li><a href="../library/file-io.html">Работа с файлами</a></li>
+</ul>
+<p class="group">C++</p><ul>
+<li><a href="../cpp/differences.html">Отличия от C</a></li>
+<li><a href="../cpp/references.html">Ссылки</a></li>
+<li><a href="../cpp/namespaces.html">Пространства имён</a></li>
+<li><a href="../cpp/overloading.html">Перегрузка функций</a></li>
+<li><a href="../cpp/classes.html">Классы и объекты</a></li>
+<li><a href="../cpp/inheritance.html">Наследование</a></li>
+<li><a href="../cpp/operators.html">Перегрузка операторов</a></li>
+<li><a href="../cpp/templates.html">Шаблоны</a></li>
+<li><a href="../cpp/new-delete.html">new и delete</a></li>
+<li><a href="../cpp/exceptions.html">Исключения</a></li>
+<li><a href="../cpp/const-constexpr.html">const и constexpr</a></li>
+</ul>
+<p class="group">Алгоритмы</p><ul>
+<li><a href="../algorithms/complexity.html">Сложность (O-нотация)</a></li>
+<li><a href="../algorithms/search.html">Поиск</a></li>
+<li><a href="../algorithms/sorting.html">Сортировка</a></li>
+<li><a href="../algorithms/recursion.html" class="active" aria-current="page">Рекурсия и НОД</a></li>
+<li><a href="../algorithms/primes.html">Простые числа</a></li>
+<li><a href="../algorithms/data-structures.html">Структуры данных</a></li>
+</ul>
+<p class="group">Микроконтроллеры</p><ul>
+<li><a href="../mcu/index.html">Раздел (WIP)</a></li>
+</ul>
+<p class="group">Практика</p><ul>
+<li><a href="../examples/index.html">Примеры программ</a></li>
+<li><a href="../faq.html">FAQ и глоссарий</a></li>
+</ul>
+</nav>
+<main>
+<h1>Рекурсия и НОД</h1>
+<p><b>Рекурсия</b> — когда функция вызывает саму себя для задачи меньшего размера.
+У любой рекурсии должен быть <b>базовый случай</b>, иначе вызовы не закончатся и переполнится стек.
+Каждый активный вызов занимает кадр стека, поэтому глубина рекурсии ограничена памятью.</p>
+
+<h2>Факториал и числа Фибоначчи</h2>
+<p>Факториал считается рекурсией естественно, и глубина равна <code>n</code>.
+Наивный Фибоначчи <code>F(n) = F(n-1) + F(n-2)</code> делает экспоненциальное число вызовов:
+одно и то же подзначение пересчитывается много раз. Для таких задач лучше цикл или запоминание
+уже посчитанных значений.</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+static unsigned long long factorial(unsigned n)
+{
+    if (n &lt;= 1)
+        return 1ULL;
+    return n * factorial(n - 1);
+}
+
+static unsigned fib_iter(unsigned n)
+{
+    if (n &lt;= 1)
+        return n;
+    unsigned a = 0, b = 1;
+    for (unsigned i = 2; i &lt;= n; i++) {
+        unsigned next = a + b;
+        a = b;
+        b = next;
+    }
+    return b;
+}
+
+int main(void)
+{
+    printf("10! = %llu\n", factorial(10));
+    printf("F(10) = %u\n", fib_iter(10));
+    return 0;
+}</code></pre></figure>
+<h2>Алгоритм Евклида</h2>
+<p>Наибольший общий делитель (НОД) чисел <code>a</code> и <code>b</code> — наибольшее натуральное число,
+на которое оба делятся без остатка. Евклид заметил: <code>gcd(a, b) = gcd(b, a mod b)</code>,
+а <code>gcd(a, 0) = a</code>. Это один из древнейших известных алгоритмов; число шагов —
+<code>O(log min(a, b))</code>.</p>
+<p>Наименьшее общее кратное: <code>lcm(a, b) = |a / gcd(a, b) * b|</code>. Делить нужно до умножения,
+чтобы меньше рисковать переполнением.</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+static unsigned gcd(unsigned a, unsigned b)
+{
+    while (b != 0) {
+        unsigned t = a % b;
+        a = b;
+        b = t;
+    }
+    return a;
+}
+
+static unsigned gcd_rec(unsigned a, unsigned b)
+{
+    return b == 0 ? a : gcd_rec(b, a % b);
+}
+
+static unsigned lcm(unsigned a, unsigned b)
+{
+    if (a == 0 || b == 0)
+        return 0;
+    return (a / gcd(a, b)) * b;
+}
+
+int main(void)
+{
+    printf("gcd(84, 36) = %u (рекурсия %u)\n", gcd(84, 36), gcd_rec(84, 36));
+    printf("lcm(84, 36) = %u\n", lcm(84, 36));
+    printf("gcd(17, 13) = %u\n", gcd(17, 13));
+    return 0;
+}</code></pre></figure>
+<div class="note">Итеративная и рекурсивная записи Евклида эквивалентны. Итеративная не расходует стек
+и в обычном коде предпочтительнее; рекурсивная хорошо показывает саму идею сведения задачи к меньшей.</div>
+<div class="warn">Глубокая рекурсия (десятки и сотни тысяч кадров) опасна: стек потока куда меньше кучи.
+Если глубина может расти как <code>O(n)</code> на больших входах, лучше переписать алгоритм циклом
+или явной своей стопкой.</div>
+<nav class="pager" aria-label="Соседние страницы"><a class="prev" href="../algorithms/sorting.html">← Сортировка</a><a class="next" href="../algorithms/primes.html">Простые числа →</a></nav>
+</main>
+</div>
+<footer class="footer">
+<p>Справочник по языкам C и C++ — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+Подсветка: <a href="../assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="../assets/fonts/OFL.txt">OFL 1.1</a>).</p>
+</footer>
+<script src="../assets/js/prism.js"></script>
+</body>
+</html>

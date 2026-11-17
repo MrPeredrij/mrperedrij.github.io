@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Сортировка — Справочник по C</title>
+<meta name="description" content="Пузырьковая сортировка, вставки, выбором, быстрая и сортировка слиянием: идеи, код на C и сложность.">
+<link rel="preload" href="../assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="../index.html"><span class="logo">C</span> Справочник по C</a>
+<span class="std">C11 · C17 · C++17</span>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Разделы">
+<p class="group">Начало</p><ul>
+<li><a href="../index.html">Главная</a></li>
+<li><a href="../getting-started/install-and-compile.html">Установка и компиляция</a></li>
+</ul>
+<p class="group">Основы</p><ul>
+<li><a href="../basics/syntax.html">Синтаксис и операторы</a></li>
+<li><a href="../basics/types-and-variables.html">Типы и переменные</a></li>
+<li><a href="../basics/control-flow.html">Управление потоком</a></li>
+</ul>
+<p class="group">Язык</p><ul>
+<li><a href="../language/functions.html">Функции</a></li>
+<li><a href="../language/arrays-and-strings.html">Массивы и строки</a></li>
+<li><a href="../language/pointers.html">Указатели</a></li>
+<li><a href="../language/memory.html">Память</a></li>
+<li><a href="../language/structs-unions-enums.html">Структуры и enum</a></li>
+<li><a href="../language/preprocessor.html">Препроцессор</a></li>
+</ul>
+<p class="group">Библиотека</p><ul>
+<li><a href="../library/stdlib.html">Стандартная библиотека</a></li>
+<li><a href="../library/file-io.html">Работа с файлами</a></li>
+</ul>
+<p class="group">C++</p><ul>
+<li><a href="../cpp/differences.html">Отличия от C</a></li>
+<li><a href="../cpp/references.html">Ссылки</a></li>
+<li><a href="../cpp/namespaces.html">Пространства имён</a></li>
+<li><a href="../cpp/overloading.html">Перегрузка функций</a></li>
+<li><a href="../cpp/classes.html">Классы и объекты</a></li>
+<li><a href="../cpp/inheritance.html">Наследование</a></li>
+<li><a href="../cpp/operators.html">Перегрузка операторов</a></li>
+<li><a href="../cpp/templates.html">Шаблоны</a></li>
+<li><a href="../cpp/new-delete.html">new и delete</a></li>
+<li><a href="../cpp/exceptions.html">Исключения</a></li>
+<li><a href="../cpp/const-constexpr.html">const и constexpr</a></li>
+</ul>
+<p class="group">Алгоритмы</p><ul>
+<li><a href="../algorithms/complexity.html">Сложность (O-нотация)</a></li>
+<li><a href="../algorithms/search.html">Поиск</a></li>
+<li><a href="../algorithms/sorting.html" class="active" aria-current="page">Сортировка</a></li>
+<li><a href="../algorithms/recursion.html">Рекурсия и НОД</a></li>
+<li><a href="../algorithms/primes.html">Простые числа</a></li>
+<li><a href="../algorithms/data-structures.html">Структуры данных</a></li>
+</ul>
+<p class="group">Микроконтроллеры</p><ul>
+<li><a href="../mcu/index.html">Раздел (WIP)</a></li>
+</ul>
+<p class="group">Практика</p><ul>
+<li><a href="../examples/index.html">Примеры программ</a></li>
+<li><a href="../faq.html">FAQ и глоссарий</a></li>
+</ul>
+</nav>
+<main>
+<h1>Сортировка</h1>
+<p>Пять классических алгоритмов сортировки массива целых по неубыванию. Первые три просты и требуют
+<code>O(1)</code> дополнительной памяти, но работают за <code>O(n<sup>2</sup>)</code>.
+Быстрая сортировка и сортировка слиянием дают <code>O(n log n)</code> в типичном случае
+и используются на практике (часто в гибридных вариантах).</p>
+<table>
+<thead><tr><th>Алгоритм</th><th>Худший</th><th>Средний</th><th>Память</th><th>Стабильный</th></tr></thead>
+<tbody>
+<tr><td>Пузырьковая</td><td><code>O(n<sup>2</sup>)</code></td><td><code>O(n<sup>2</sup>)</code></td><td><code>O(1)</code></td><td>да</td></tr>
+<tr><td>Вставки</td><td><code>O(n<sup>2</sup>)</code></td><td><code>O(n<sup>2</sup>)</code></td><td><code>O(1)</code></td><td>да</td></tr>
+<tr><td>Выбором</td><td><code>O(n<sup>2</sup>)</code></td><td><code>O(n<sup>2</sup>)</code></td><td><code>O(1)</code></td><td>нет</td></tr>
+<tr><td>Быстрая</td><td><code>O(n<sup>2</sup>)</code></td><td><code>O(n log n)</code></td><td><code>O(log n)</code> стек</td><td>обычно нет</td></tr>
+<tr><td>Слиянием</td><td><code>O(n log n)</code></td><td><code>O(n log n)</code></td><td><code>O(n)</code></td><td>да</td></tr>
+</tbody>
+</table>
+<p><b>Стабильность</b> означает: элементы с равными ключами сохраняют исходный относительный порядок.
+Это важно, когда сортируют записи по одному полю, уже упорядоченные по другому.</p>
+
+<h2>Пузырьковая сортировка</h2>
+<p>Соседние элементы сравниваются и при необходимости меняются местами. За один проход «всплывает»
+наибольший элемент. Если за проход не было обменов, массив уже отсортирован — можно выйти раньше
+(лучший случай тогда <code>O(n)</code>).</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdbool.h&gt;
+
+static void swap_int(int *a, int *b)
+{
+    int t = *a;
+    *a = *b;
+    *b = t;
+}
+
+static void bubble_sort(int *a, int n)
+{
+    for (int i = 0; i &lt; n - 1; i++) {
+        bool swapped = false;
+        for (int j = 0; j &lt; n - 1 - i; j++) {
+            if (a[j] &gt; a[j + 1]) {
+                swap_int(&amp;a[j], &amp;a[j + 1]);
+                swapped = true;
+            }
+        }
+        if (!swapped)
+            break;
+    }
+}
+
+static void print_array(const int *a, int n)
+{
+    for (int i = 0; i &lt; n; i++)
+        printf("%d%s", a[i], i + 1 == n ? "\n" : " ");
+}
+
+int main(void)
+{
+    int a[] = { 5, 1, 4, 2, 8, 0, 2 };
+    int n = (int)(sizeof a / sizeof a[0]);
+    bubble_sort(a, n);
+    print_array(a, n);
+    return 0;
+}</code></pre></figure>
+<h2>Сортировка вставками</h2>
+<p>Левая часть массива уже упорядочена. Очередной элемент вставляется в неё на своё место,
+сдвигая большие вправо. На почти отсортированных данных работает близко к <code>O(n)</code>
+и часто используется как финальная стадия быстрых алгоритмов для коротких кусков.</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+static void insertion_sort(int *a, int n)
+{
+    for (int i = 1; i &lt; n; i++) {
+        int key = a[i];
+        int j = i - 1;
+        while (j &gt;= 0 &amp;&amp; a[j] &gt; key) {
+            a[j + 1] = a[j];
+            j--;
+        }
+        a[j + 1] = key;
+    }
+}
+
+int main(void)
+{
+    int a[] = { 9, 3, 7, 1, 8, 2, 5 };
+    int n = (int)(sizeof a / sizeof a[0]);
+    insertion_sort(a, n);
+    for (int i = 0; i &lt; n; i++)
+        printf("%d%s", a[i], i + 1 == n ? "\n" : " ");
+    return 0;
+}</code></pre></figure>
+<h2>Сортировка выбором</h2>
+<p>На шаге <code>i</code> находим минимум в ещё неотсортированном хвосте и меняем его с <code>a[i]</code>.
+Число сравнений всегда <code>O(n<sup>2</sup>)</code>, даже на отсортированном массиве.
+Обменов мало (не больше <code>n</code>) — иногда это важно, если обмен дороже сравнения.</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+static void swap_int(int *a, int *b)
+{
+    int t = *a;
+    *a = *b;
+    *b = t;
+}
+
+static void selection_sort(int *a, int n)
+{
+    for (int i = 0; i &lt; n - 1; i++) {
+        int min = i;
+        for (int j = i + 1; j &lt; n; j++) {
+            if (a[j] &lt; a[min])
+                min = j;
+        }
+        if (min != i)
+            swap_int(&amp;a[i], &amp;a[min]);
+    }
+}
+
+int main(void)
+{
+    int a[] = { 64, 25, 12, 22, 11 };
+    int n = (int)(sizeof a / sizeof a[0]);
+    selection_sort(a, n);
+    for (int i = 0; i &lt; n; i++)
+        printf("%d%s", a[i], i + 1 == n ? "\n" : " ");
+    return 0;
+}</code></pre></figure>
+<h2>Быстрая сортировка (quicksort)</h2>
+<p>Выбираем опорный элемент (pivot), переставляем массив так, чтобы слева оказались значения не больше
+опоры, справа — не меньше, и рекурсивно сортируем обе части. Среднее время <code>O(n log n)</code>.
+Если опора постоянно оказывается минимумом или максимумом (например, всегда брать последний элемент
+на уже отсортированном массиве), получается <code>O(n<sup>2</sup>)</code>. Ниже опора берётся из середины
+диапазона — для учебных примеров этого достаточно.</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+static void swap_int(int *a, int *b)
+{
+    int t = *a;
+    *a = *b;
+    *b = t;
+}
+
+static int partition(int *a, int lo, int hi)
+{
+    int mid = lo + (hi - lo) / 2;
+    swap_int(&amp;a[mid], &amp;a[hi]);
+    int pivot = a[hi];
+    int i = lo;
+    for (int j = lo; j &lt; hi; j++) {
+        if (a[j] &lt;= pivot) {
+            swap_int(&amp;a[i], &amp;a[j]);
+            i++;
+        }
+    }
+    swap_int(&amp;a[i], &amp;a[hi]);
+    return i;
+}
+
+static void quicksort(int *a, int lo, int hi)
+{
+    if (lo &gt;= hi)
+        return;
+    int p = partition(a, lo, hi);
+    quicksort(a, lo, p - 1);
+    quicksort(a, p + 1, hi);
+}
+
+int main(void)
+{
+    int a[] = { 10, 7, 8, 9, 1, 5, 3 };
+    int n = (int)(sizeof a / sizeof a[0]);
+    quicksort(a, 0, n - 1);
+    for (int i = 0; i &lt; n; i++)
+        printf("%d%s", a[i], i + 1 == n ? "\n" : " ");
+    return 0;
+}</code></pre></figure>
+<h2>Сортировка слиянием (mergesort)</h2>
+<p>Массив делится пополам, половины сортируются рекурсивно, затем два упорядоченных куска сливаются
+в один. Слияние требует временного буфера. Время всегда <code>O(n log n)</code>, алгоритм стабилен.
+Цена — дополнительная память <code>O(n)</code> и больше копирований, чем у быстрой сортировки в среднем.</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+static void merge(int *a, int *tmp, int lo, int mid, int hi)
+{
+    int i = lo, j = mid, k = lo;
+    while (i &lt; mid &amp;&amp; j &lt; hi) {
+        if (a[i] &lt;= a[j])
+            tmp[k++] = a[i++];
+        else
+            tmp[k++] = a[j++];
+    }
+    while (i &lt; mid)
+        tmp[k++] = a[i++];
+    while (j &lt; hi)
+        tmp[k++] = a[j++];
+    for (k = lo; k &lt; hi; k++)
+        a[k] = tmp[k];
+}
+
+static void mergesort_rec(int *a, int *tmp, int lo, int hi)
+{
+    if (hi - lo &lt;= 1)
+        return;
+    int mid = lo + (hi - lo) / 2;
+    mergesort_rec(a, tmp, lo, mid);
+    mergesort_rec(a, tmp, mid, hi);
+    merge(a, tmp, lo, mid, hi);
+}
+
+int main(void)
+{
+    int a[] = { 38, 27, 43, 3, 9, 82, 10 };
+    int n = (int)(sizeof a / sizeof a[0]);
+    int tmp[7];
+    mergesort_rec(a, tmp, 0, n);
+    for (int i = 0; i &lt; n; i++)
+        printf("%d%s", a[i], i + 1 == n ? "\n" : " ");
+    return 0;
+}</code></pre></figure>
+<div class="note">В стандартной библиотеке C есть <code>qsort</code> из <code>&lt;stdlib.h&gt;</code> —
+универсальная сортировка через указатель на функцию сравнения. Имеет смысл понимать, как устроены
+алгоритмы выше, прежде чем вызывать готовую функцию.</div>
+<nav class="pager" aria-label="Соседние страницы"><a class="prev" href="../algorithms/search.html">← Поиск</a><a class="next" href="../algorithms/recursion.html">Рекурсия и НОД →</a></nav>
+</main>
+</div>
+<footer class="footer">
+<p>Справочник по языкам C и C++ — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+Подсветка: <a href="../assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="../assets/fonts/OFL.txt">OFL 1.1</a>).</p>
+</footer>
+<script src="../assets/js/prism.js"></script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Классы и объекты — Справочник по C</title>
+<meta name="description" content="Классы C++: поля и методы, конструкторы и деструкторы, спецификаторы доступа, this и правило трёх.">
+<link rel="preload" href="../assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="../index.html"><span class="logo">C</span> Справочник по C</a>
+<span class="std">C11 · C17 · C++17</span>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Разделы">
+<p class="group">Начало</p><ul>
+<li><a href="../index.html">Главная</a></li>
+<li><a href="../getting-started/install-and-compile.html">Установка и компиляция</a></li>
+</ul>
+<p class="group">Основы</p><ul>
+<li><a href="../basics/syntax.html">Синтаксис и операторы</a></li>
+<li><a href="../basics/types-and-variables.html">Типы и переменные</a></li>
+<li><a href="../basics/control-flow.html">Управление потоком</a></li>
+</ul>
+<p class="group">Язык</p><ul>
+<li><a href="../language/functions.html">Функции</a></li>
+<li><a href="../language/arrays-and-strings.html">Массивы и строки</a></li>
+<li><a href="../language/pointers.html">Указатели</a></li>
+<li><a href="../language/memory.html">Память</a></li>
+<li><a href="../language/structs-unions-enums.html">Структуры и enum</a></li>
+<li><a href="../language/preprocessor.html">Препроцессор</a></li>
+</ul>
+<p class="group">Библиотека</p><ul>
+<li><a href="../library/stdlib.html">Стандартная библиотека</a></li>
+<li><a href="../library/file-io.html">Работа с файлами</a></li>
+</ul>
+<p class="group">C++</p><ul>
+<li><a href="../cpp/differences.html">Отличия от C</a></li>
+<li><a href="../cpp/references.html">Ссылки</a></li>
+<li><a href="../cpp/namespaces.html">Пространства имён</a></li>
+<li><a href="../cpp/overloading.html">Перегрузка функций</a></li>
+<li><a href="../cpp/classes.html" class="active" aria-current="page">Классы и объекты</a></li>
+<li><a href="../cpp/inheritance.html">Наследование</a></li>
+<li><a href="../cpp/operators.html">Перегрузка операторов</a></li>
+<li><a href="../cpp/templates.html">Шаблоны</a></li>
+<li><a href="../cpp/new-delete.html">new и delete</a></li>
+<li><a href="../cpp/exceptions.html">Исключения</a></li>
+<li><a href="../cpp/const-constexpr.html">const и constexpr</a></li>
+</ul>
+<p class="group">Алгоритмы</p><ul>
+<li><a href="../algorithms/complexity.html">Сложность (O-нотация)</a></li>
+<li><a href="../algorithms/search.html">Поиск</a></li>
+<li><a href="../algorithms/sorting.html">Сортировка</a></li>
+<li><a href="../algorithms/recursion.html">Рекурсия и НОД</a></li>
+<li><a href="../algorithms/primes.html">Простые числа</a></li>
+<li><a href="../algorithms/data-structures.html">Структуры данных</a></li>
+</ul>
+<p class="group">Микроконтроллеры</p><ul>
+<li><a href="../mcu/index.html">Раздел (WIP)</a></li>
+</ul>
+<p class="group">Практика</p><ul>
+<li><a href="../examples/index.html">Примеры программ</a></li>
+<li><a href="../faq.html">FAQ и глоссарий</a></li>
+</ul>
+</nav>
+<main>
+<h1>Классы и объекты</h1>
+<p><b>Класс</b> объединяет данные и функции, которые с ними работают. <b>Объект</b> — переменная такого типа.
+Отличие <code>class</code> от <code>struct</code> в C++ почти только в доступе по умолчанию:
+у <code>class</code> это <code>private</code>, у <code>struct</code> — <code>public</code>.</p>
+<figure class="code"><figcaption>C++</figcaption><pre><code class="language-cpp">#include &lt;cstdio&gt;
+
+class Counter {
+public:
+    explicit Counter(int start = 0) : value_(start) {}
+
+    void increment()
+    {
+        ++value_;
+    }
+
+    int value() const
+    {
+        return value_;
+    }
+
+private:
+    int value_;
+};
+
+int main()
+{
+    Counter c{3};
+    c.increment();
+    std::printf("%d\n", c.value());
+    return 0;
+}</code></pre></figure>
+<h2>Спецификаторы доступа</h2>
+<table>
+<thead><tr><th>Спецификатор</th><th>Кто может обратиться</th></tr></thead>
+<tbody>
+<tr><td><code>public</code></td><td>Любой код, у которого есть объект или указатель/ссылка на него</td></tr>
+<tr><td><code>protected</code></td><td>Сам класс и производные классы (см. <a href="../cpp/inheritance.html">Наследование</a>)</td></tr>
+<tr><td><code>private</code></td><td>Только этот класс (и друзья, <code>friend</code>)</td></tr>
+</tbody>
+</table>
+<p>Поля обычно делают закрытыми, а наружу выставляют методы. Так проще сохранить инварианты
+(например, «счётчик не отрицательный»).</p>
+
+<h2>Конструкторы и деструктор</h2>
+<p><b>Конструктор</b> вызывается при создании объекта, <b>деструктор</b> — при уничтожении
+(выход из блока, <code>delete</code>, раскрутка стека). Список инициализации
+(<code>: value_(start)</code>) инициализирует поля до входа в тело конструктора — это предпочтительный способ,
+особенно для ссылок, <code>const</code>-полей и классов без конструктора по умолчанию.</p>
+<p>Ключевое слово <code>explicit</code> запрещает использовать конструктор от одного аргумента
+как неявное преобразование типа.</p>
+<figure class="code"><figcaption>C++</figcaption><pre><code class="language-cpp">#include &lt;cstdio&gt;
+
+class Buffer {
+public:
+    explicit Buffer(int n) : size_(n), data_(new int[static_cast&lt;unsigned&gt;(n)])
+    {
+        for (int i = 0; i &lt; size_; ++i)
+            data_[i] = 0;
+        std::printf("Buffer(%d) создан\n", size_);
+    }
+
+    ~Buffer()
+    {
+        delete[] data_;
+        std::printf("Buffer(%d) уничтожен\n", size_);
+    }
+
+    int size() const { return size_; }
+
+    void set(int i, int v) { data_[i] = v; }
+
+    int get(int i) const { return data_[i]; }
+
+private:
+    int size_;
+    int *data_;
+};
+
+int main()
+{
+    Buffer buf{3};
+    buf.set(1, 42);
+    std::printf("buf[1] = %d\n", buf.get(1));
+    return 0;
+}</code></pre></figure>
+<h2>Указатель this</h2>
+<p>Внутри метода <code>this</code> указывает на текущий объект. Для него <code>value_</code> и
+<code>this-&gt;value_</code> — одно и то же. Он нужен, когда имя параметра совпадает с именем поля,
+и когда метод возвращает ссылку на себя (<code>return *this;</code>).</p>
+
+<h2>Правило трёх</h2>
+<p>Если класс сам управляет ресурсом (память, файл, дескриптор) и ему нужен пользовательский деструктор,
+скорее всего понадобятся и <b>конструктор копирования</b>, и <b>оператор присваивания</b>.
+Иначе копирование по умолчанию скопирует только указатель, и два объекта будут освобождать одну и ту же память.</p>
+<p>Минимальная защита — запретить копирование:</p>
+<figure class="code"><figcaption>C++</figcaption><pre><code class="language-cpp">#include &lt;cstdio&gt;
+
+class UniqueFlag {
+public:
+    UniqueFlag() : on_(new bool{false}) {}
+    ~UniqueFlag() { delete on_; }
+
+    UniqueFlag(const UniqueFlag &amp;) = delete;
+    UniqueFlag &amp;operator=(const UniqueFlag &amp;) = delete;
+
+    void set(bool v) { *on_ = v; }
+    bool get() const { return *on_; }
+
+private:
+    bool *on_;
+};
+
+int main()
+{
+    UniqueFlag f;
+    f.set(true);
+    std::printf("%d\n", f.get() ? 1 : 0);
+    return 0;
+}</code></pre></figure>
+<div class="note">В C++11 говорят о «правиле пяти»: к тройке добавляются конструктор перемещения и
+оператор перемещающего присваивания. Часто ещё проще следовать <i>правилу нуля</i>: не хранить сырой ресурс,
+а отдать его члену, который сам умеет копироваться и уничтожаться.</div>
+<nav class="pager" aria-label="Соседние страницы"><a class="prev" href="../cpp/overloading.html">← Перегрузка функций</a><a class="next" href="../cpp/inheritance.html">Наследование →</a></nav>
+</main>
+</div>
+<footer class="footer">
+<p>Справочник по языкам C и C++ — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+Подсветка: <a href="../assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="../assets/fonts/OFL.txt">OFL 1.1</a>).</p>
+</footer>
+<script src="../assets/js/prism.js"></script>
+</body>
+</html>

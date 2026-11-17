@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ссылки — Справочник по C</title>
+<meta name="description" content="Ссылки C++: отличие от указателей, инициализация, передача в функцию и константные ссылки.">
+<link rel="preload" href="../assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="../index.html"><span class="logo">C</span> Справочник по C</a>
+<span class="std">C11 · C17 · C++17</span>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Разделы">
+<p class="group">Начало</p><ul>
+<li><a href="../index.html">Главная</a></li>
+<li><a href="../getting-started/install-and-compile.html">Установка и компиляция</a></li>
+</ul>
+<p class="group">Основы</p><ul>
+<li><a href="../basics/syntax.html">Синтаксис и операторы</a></li>
+<li><a href="../basics/types-and-variables.html">Типы и переменные</a></li>
+<li><a href="../basics/control-flow.html">Управление потоком</a></li>
+</ul>
+<p class="group">Язык</p><ul>
+<li><a href="../language/functions.html">Функции</a></li>
+<li><a href="../language/arrays-and-strings.html">Массивы и строки</a></li>
+<li><a href="../language/pointers.html">Указатели</a></li>
+<li><a href="../language/memory.html">Память</a></li>
+<li><a href="../language/structs-unions-enums.html">Структуры и enum</a></li>
+<li><a href="../language/preprocessor.html">Препроцессор</a></li>
+</ul>
+<p class="group">Библиотека</p><ul>
+<li><a href="../library/stdlib.html">Стандартная библиотека</a></li>
+<li><a href="../library/file-io.html">Работа с файлами</a></li>
+</ul>
+<p class="group">C++</p><ul>
+<li><a href="../cpp/differences.html">Отличия от C</a></li>
+<li><a href="../cpp/references.html" class="active" aria-current="page">Ссылки</a></li>
+<li><a href="../cpp/namespaces.html">Пространства имён</a></li>
+<li><a href="../cpp/overloading.html">Перегрузка функций</a></li>
+<li><a href="../cpp/classes.html">Классы и объекты</a></li>
+<li><a href="../cpp/inheritance.html">Наследование</a></li>
+<li><a href="../cpp/operators.html">Перегрузка операторов</a></li>
+<li><a href="../cpp/templates.html">Шаблоны</a></li>
+<li><a href="../cpp/new-delete.html">new и delete</a></li>
+<li><a href="../cpp/exceptions.html">Исключения</a></li>
+<li><a href="../cpp/const-constexpr.html">const и constexpr</a></li>
+</ul>
+<p class="group">Алгоритмы</p><ul>
+<li><a href="../algorithms/complexity.html">Сложность (O-нотация)</a></li>
+<li><a href="../algorithms/search.html">Поиск</a></li>
+<li><a href="../algorithms/sorting.html">Сортировка</a></li>
+<li><a href="../algorithms/recursion.html">Рекурсия и НОД</a></li>
+<li><a href="../algorithms/primes.html">Простые числа</a></li>
+<li><a href="../algorithms/data-structures.html">Структуры данных</a></li>
+</ul>
+<p class="group">Микроконтроллеры</p><ul>
+<li><a href="../mcu/index.html">Раздел (WIP)</a></li>
+</ul>
+<p class="group">Практика</p><ul>
+<li><a href="../examples/index.html">Примеры программ</a></li>
+<li><a href="../faq.html">FAQ и глоссарий</a></li>
+</ul>
+</nav>
+<main>
+<h1>Ссылки</h1>
+<p><b>Ссылка</b> (<code>T&amp;</code>) — ещё одно имя уже существующего объекта. В отличие от указателя,
+ссылка должна быть инициализирована в момент объявления и не может потом «перенацелиться» на другой объект.
+У ссылки нет собственного «пустого» значения вроде <code>nullptr</code>.</p>
+<figure class="code"><figcaption>C++</figcaption><pre><code class="language-cpp">#include &lt;cstdio&gt;
+
+int main()
+{
+    int x = 10;
+    int &amp;ref = x;      // ref — другое имя для x
+    ref = 20;          // меняется x
+    std::printf("x = %d, ref = %d\n", x, ref);
+
+    int y = 5;
+    ref = y;           // это присваивание в x, а не «перепривязка» ref
+    std::printf("x = %d, y = %d\n", x, y);
+    return 0;
+}</code></pre></figure>
+<h2>Ссылки и указатели</h2>
+<table>
+<thead><tr><th></th><th>Указатель <code>T *</code></th><th>Ссылка <code>T&amp;</code></th></tr></thead>
+<tbody>
+<tr><td>Может быть пустым</td><td>да, <code>nullptr</code></td><td>нет</td></tr>
+<tr><td>Можно сменить цель</td><td>да, <code>p = q</code></td><td>нет</td></tr>
+<tr><td>Нужно разыменовывать</td><td>да, <code>*p</code>, <code>p-&gt;x</code></td><td>нет, имя используется как само значение</td></tr>
+<tr><td>Арифметика</td><td>да</td><td>нет</td></tr>
+</tbody>
+</table>
+
+<h2>Передача в функцию</h2>
+<p>Через ссылку функция меняет исходный объект — без взятия адреса на стороне вызова и без <code>*</code> внутри.</p>
+<figure class="code"><figcaption>C++</figcaption><pre><code class="language-cpp">#include &lt;cstdio&gt;
+
+static void swap_ref(int &amp;a, int &amp;b)
+{
+    int tmp = a;
+    a = b;
+    b = tmp;
+}
+
+int main()
+{
+    int x = 1, y = 2;
+    swap_ref(x, y);
+    std::printf("x = %d, y = %d\n", x, y);
+    return 0;
+}</code></pre></figure>
+<h2>Константные ссылки</h2>
+<p><code>const T&amp;</code> разрешает читать объект, но не изменять его. Так передают крупные объекты
+без копирования. Константная ссылка может быть привязана и к временному значению: компилятор продлевает
+жизнь временного объекта до конца области видимости ссылки.</p>
+<figure class="code"><figcaption>C++</figcaption><pre><code class="language-cpp">#include &lt;cstdio&gt;
+
+static int sum(const int &amp;a, const int &amp;b)
+{
+    return a + b;
+}
+
+int main()
+{
+    int n = 40;
+    std::printf("%d\n", sum(n, 2));   // 2 — временное значение
+    return 0;
+}</code></pre></figure>
+<div class="warn">Не возвращайте ссылку (и указатель) на локальную автоматическую переменную: объект
+уничтожается при выходе из функции, и ссылка «повисает». Это неопределённое поведение.</div>
+<figure class="code"><figcaption>C++</figcaption><pre><code class="language-cpp">#include &lt;cstdio&gt;
+
+static int &amp;first(int *a)
+{
+    return a[0];    // ссылка на элемент, который живёт дольше функции
+}
+
+int main()
+{
+    int data[] = { 3, 1, 4 };
+    first(data) = 7;
+    std::printf("%d %d %d\n", data[0], data[1], data[2]);
+    return 0;
+}</code></pre></figure>
+<div class="note">C++11 добавил <i>rvalue-ссылки</i> (<code>T&amp;&amp;</code>) и семантику перемещения.
+Это отдельная тема; в базовом курсе достаточно уверенно пользоваться <code>T&amp;</code> и <code>const T&amp;</code>.</div>
+<nav class="pager" aria-label="Соседние страницы"><a class="prev" href="../cpp/differences.html">← Отличия от C</a><a class="next" href="../cpp/namespaces.html">Пространства имён →</a></nav>
+</main>
+</div>
+<footer class="footer">
+<p>Справочник по языкам C и C++ — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+Подсветка: <a href="../assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="../assets/fonts/OFL.txt">OFL 1.1</a>).</p>
+</footer>
+<script src="../assets/js/prism.js"></script>
+</body>
+</html>

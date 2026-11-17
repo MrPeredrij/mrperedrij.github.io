@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>new и delete — Справочник по C</title>
+<meta name="description" content="Динамическая память в C++: new, delete, массивы, отличие от malloc/free и типичные ошибки.">
+<link rel="preload" href="../assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="../index.html"><span class="logo">C</span> Справочник по C</a>
+<span class="std">C11 · C17 · C++17</span>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Разделы">
+<p class="group">Начало</p><ul>
+<li><a href="../index.html">Главная</a></li>
+<li><a href="../getting-started/install-and-compile.html">Установка и компиляция</a></li>
+</ul>
+<p class="group">Основы</p><ul>
+<li><a href="../basics/syntax.html">Синтаксис и операторы</a></li>
+<li><a href="../basics/types-and-variables.html">Типы и переменные</a></li>
+<li><a href="../basics/control-flow.html">Управление потоком</a></li>
+</ul>
+<p class="group">Язык</p><ul>
+<li><a href="../language/functions.html">Функции</a></li>
+<li><a href="../language/arrays-and-strings.html">Массивы и строки</a></li>
+<li><a href="../language/pointers.html">Указатели</a></li>
+<li><a href="../language/memory.html">Память</a></li>
+<li><a href="../language/structs-unions-enums.html">Структуры и enum</a></li>
+<li><a href="../language/preprocessor.html">Препроцессор</a></li>
+</ul>
+<p class="group">Библиотека</p><ul>
+<li><a href="../library/stdlib.html">Стандартная библиотека</a></li>
+<li><a href="../library/file-io.html">Работа с файлами</a></li>
+</ul>
+<p class="group">C++</p><ul>
+<li><a href="../cpp/differences.html">Отличия от C</a></li>
+<li><a href="../cpp/references.html">Ссылки</a></li>
+<li><a href="../cpp/namespaces.html">Пространства имён</a></li>
+<li><a href="../cpp/overloading.html">Перегрузка функций</a></li>
+<li><a href="../cpp/classes.html">Классы и объекты</a></li>
+<li><a href="../cpp/inheritance.html">Наследование</a></li>
+<li><a href="../cpp/operators.html">Перегрузка операторов</a></li>
+<li><a href="../cpp/templates.html">Шаблоны</a></li>
+<li><a href="../cpp/new-delete.html" class="active" aria-current="page">new и delete</a></li>
+<li><a href="../cpp/exceptions.html">Исключения</a></li>
+<li><a href="../cpp/const-constexpr.html">const и constexpr</a></li>
+</ul>
+<p class="group">Алгоритмы</p><ul>
+<li><a href="../algorithms/complexity.html">Сложность (O-нотация)</a></li>
+<li><a href="../algorithms/search.html">Поиск</a></li>
+<li><a href="../algorithms/sorting.html">Сортировка</a></li>
+<li><a href="../algorithms/recursion.html">Рекурсия и НОД</a></li>
+<li><a href="../algorithms/primes.html">Простые числа</a></li>
+<li><a href="../algorithms/data-structures.html">Структуры данных</a></li>
+</ul>
+<p class="group">Микроконтроллеры</p><ul>
+<li><a href="../mcu/index.html">Раздел (WIP)</a></li>
+</ul>
+<p class="group">Практика</p><ul>
+<li><a href="../examples/index.html">Примеры программ</a></li>
+<li><a href="../faq.html">FAQ и глоссарий</a></li>
+</ul>
+</nav>
+<main>
+<h1>new и delete</h1>
+<p>Оператор <code>new</code> выделяет память и <b>вызывает конструктор</b>.
+<code>delete</code> вызывает деструктор и освобождает память.
+Для массивов используют пару <code>new[]</code> / <code>delete[]</code> — смешивать с обычными
+<code>new</code> / <code>delete</code> нельзя.</p>
+<figure class="code"><figcaption>C++</figcaption><pre><code class="language-cpp">#include &lt;cstdio&gt;
+
+class Point {
+public:
+    Point(int x, int y) : x_(x), y_(y)
+    {
+        std::printf("Point(%d, %d)\n", x_, y_);
+    }
+    ~Point() { std::printf("~Point(%d, %d)\n", x_, y_); }
+    int x() const { return x_; }
+    int y() const { return y_; }
+
+private:
+    int x_, y_;
+};
+
+int main()
+{
+    Point *p = new Point{2, 3};
+    std::printf("x = %d\n", p-&gt;x());
+    delete p;
+
+    int *xs = new int[3]{10, 20, 30};
+    std::printf("%d %d %d\n", xs[0], xs[1], xs[2]);
+    delete[] xs;
+    return 0;
+}</code></pre></figure>
+<h2>Сравнение с malloc и free</h2>
+<table>
+<thead><tr><th></th><th><code>malloc</code> / <code>free</code></th><th><code>new</code> / <code>delete</code></th></tr></thead>
+<tbody>
+<tr><td>Язык</td><td>C (доступны и в C++)</td><td>Только C++</td></tr>
+<tr><td>Конструктор / деструктор</td><td>не вызываются</td><td>вызываются</td></tr>
+<tr><td>Тип результата</td><td><code>void *</code>, в C++ нужно приведение</td><td>указатель нужного типа</td></tr>
+<tr><td>Ошибка выделения</td><td>возвращает <code>NULL</code></td><td>по умолчанию бросает исключение <code>std::bad_alloc</code></td></tr>
+</tbody>
+</table>
+<div class="warn">Память, выделенную <code>new</code>, освобождают только <code>delete</code>.
+Память от <code>malloc</code> — только <code>free</code>. Смешивать нельзя.</div>
+
+<h2>Типичные ошибки</h2>
+<ul>
+<li>Забыть <code>delete</code> — утечка памяти. Для массива забыть скобки: <code>delete p;</code> вместо <code>delete[] p;</code>.</li>
+<li>Дважды вызвать <code>delete</code> для одного адреса — неопределённое поведение. После удаления полезно присвоить <code>nullptr</code>; повторный <code>delete nullptr;</code> безопасен и ничего не делает.</li>
+<li>Использовать объект после <code>delete</code> (висячий указатель).</li>
+<li>Выделить через <code>new</code> в одной функции и надеяться, что другая «когда-нибудь» освободит — легко потерять владение, особенно при раннем <code>return</code> или исключении.</li>
+</ul>
+<figure class="code"><figcaption>C++</figcaption><pre><code class="language-cpp">#include &lt;cstdio&gt;
+
+int main()
+{
+    int *p = new int{5};
+    std::printf("%d\n", *p);
+    delete p;
+    p = nullptr;
+    delete p;    // безопасно: удаление нулевого указателя — пустая операция
+    return 0;
+}</code></pre></figure>
+<div class="note">Надёжнее не разбрасывать голые <code>new</code>/<code>delete</code> по коду, а прятать ресурс
+в класс (RAII: ресурс захватывается в конструкторе и освобождается в деструкторе). Тогда исключение
+или ранний <code>return</code> не приведут к утечке. Готовые обёртки есть в стандартной библиотеке
+(<code>std::unique_ptr</code>) — они относятся к STL и будут разобраны позже.</div>
+<nav class="pager" aria-label="Соседние страницы"><a class="prev" href="../cpp/templates.html">← Шаблоны</a><a class="next" href="../cpp/exceptions.html">Исключения →</a></nav>
+</main>
+</div>
+<footer class="footer">
+<p>Справочник по языкам C и C++ — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+Подсветка: <a href="../assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="../assets/fonts/OFL.txt">OFL 1.1</a>).</p>
+</footer>
+<script src="../assets/js/prism.js"></script>
+</body>
+</html>

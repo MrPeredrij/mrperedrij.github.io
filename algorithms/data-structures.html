@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Стек, очередь и список — Справочник по C</title>
+<meta name="description" content="Базовые структуры данных на C: стек и очередь на массиве, односвязный список.">
+<link rel="preload" href="../assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="../index.html"><span class="logo">C</span> Справочник по C</a>
+<span class="std">C11 · C17 · C++17</span>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Разделы">
+<p class="group">Начало</p><ul>
+<li><a href="../index.html">Главная</a></li>
+<li><a href="../getting-started/install-and-compile.html">Установка и компиляция</a></li>
+</ul>
+<p class="group">Основы</p><ul>
+<li><a href="../basics/syntax.html">Синтаксис и операторы</a></li>
+<li><a href="../basics/types-and-variables.html">Типы и переменные</a></li>
+<li><a href="../basics/control-flow.html">Управление потоком</a></li>
+</ul>
+<p class="group">Язык</p><ul>
+<li><a href="../language/functions.html">Функции</a></li>
+<li><a href="../language/arrays-and-strings.html">Массивы и строки</a></li>
+<li><a href="../language/pointers.html">Указатели</a></li>
+<li><a href="../language/memory.html">Память</a></li>
+<li><a href="../language/structs-unions-enums.html">Структуры и enum</a></li>
+<li><a href="../language/preprocessor.html">Препроцессор</a></li>
+</ul>
+<p class="group">Библиотека</p><ul>
+<li><a href="../library/stdlib.html">Стандартная библиотека</a></li>
+<li><a href="../library/file-io.html">Работа с файлами</a></li>
+</ul>
+<p class="group">C++</p><ul>
+<li><a href="../cpp/differences.html">Отличия от C</a></li>
+<li><a href="../cpp/references.html">Ссылки</a></li>
+<li><a href="../cpp/namespaces.html">Пространства имён</a></li>
+<li><a href="../cpp/overloading.html">Перегрузка функций</a></li>
+<li><a href="../cpp/classes.html">Классы и объекты</a></li>
+<li><a href="../cpp/inheritance.html">Наследование</a></li>
+<li><a href="../cpp/operators.html">Перегрузка операторов</a></li>
+<li><a href="../cpp/templates.html">Шаблоны</a></li>
+<li><a href="../cpp/new-delete.html">new и delete</a></li>
+<li><a href="../cpp/exceptions.html">Исключения</a></li>
+<li><a href="../cpp/const-constexpr.html">const и constexpr</a></li>
+</ul>
+<p class="group">Алгоритмы</p><ul>
+<li><a href="../algorithms/complexity.html">Сложность (O-нотация)</a></li>
+<li><a href="../algorithms/search.html">Поиск</a></li>
+<li><a href="../algorithms/sorting.html">Сортировка</a></li>
+<li><a href="../algorithms/recursion.html">Рекурсия и НОД</a></li>
+<li><a href="../algorithms/primes.html">Простые числа</a></li>
+<li><a href="../algorithms/data-structures.html" class="active" aria-current="page">Структуры данных</a></li>
+</ul>
+<p class="group">Микроконтроллеры</p><ul>
+<li><a href="../mcu/index.html">Раздел (WIP)</a></li>
+</ul>
+<p class="group">Практика</p><ul>
+<li><a href="../examples/index.html">Примеры программ</a></li>
+<li><a href="../faq.html">FAQ и глоссарий</a></li>
+</ul>
+</nav>
+<main>
+<h1>Стек, очередь и связный список</h1>
+<p>Алгоритмам часто нужна не только «голая» последовательность чисел, но и структура с определёнными
+правилами вставки и удаления. Три самых нужных примитива — стек, очередь и связный список.
+Ниже они написаны на C, без библиотек контейнеров.</p>
+
+<h2>Стек</h2>
+<p>Стек работает по принципу LIFO: последним пришёл — первым ушёл. Основные операции —
+<code>push</code> (положить на вершину) и <code>pop</code> (снять вершину), обе за <code>O(1)</code>.
+Стек естественно ложится на массив и индекс вершины: так устроен и аппаратный стек вызовов.</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdbool.h&gt;
+
+enum { STACK_CAP = 8 };
+
+struct Stack {
+    int data[STACK_CAP];
+    int top;    /* индекс свободной ячейки, 0 — пустой стек */
+};
+
+static void stack_init(struct Stack *s)
+{
+    s-&gt;top = 0;
+}
+
+static bool stack_push(struct Stack *s, int v)
+{
+    if (s-&gt;top &gt;= STACK_CAP)
+        return false;
+    s-&gt;data[s-&gt;top++] = v;
+    return true;
+}
+
+static bool stack_pop(struct Stack *s, int *out)
+{
+    if (s-&gt;top == 0)
+        return false;
+    *out = s-&gt;data[--s-&gt;top];
+    return true;
+}
+
+int main(void)
+{
+    struct Stack s;
+    int v;
+    stack_init(&amp;s);
+    stack_push(&amp;s, 1);
+    stack_push(&amp;s, 2);
+    stack_push(&amp;s, 3);
+    while (stack_pop(&amp;s, &amp;v))
+        printf("%d ", v);
+    printf("\n");
+    return 0;
+}</code></pre></figure>
+<h2>Очередь</h2>
+<p>Очередь — FIFO: первым пришёл — первым ушёл. <code>enqueue</code> добавляет в хвост,
+<code>dequeue</code> забирает из головы. Удобная реализация на массиве — <b>кольцевой буфер</b>:
+индексы головы и хвоста ходят по кругу через остаток от деления. Все операции — <code>O(1)</code>.</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdbool.h&gt;
+
+enum { QUEUE_CAP = 8 };
+
+struct Queue {
+    int data[QUEUE_CAP];
+    int head;
+    int tail;
+    int size;
+};
+
+static void queue_init(struct Queue *q)
+{
+    q-&gt;head = 0;
+    q-&gt;tail = 0;
+    q-&gt;size = 0;
+}
+
+static bool enqueue(struct Queue *q, int v)
+{
+    if (q-&gt;size == QUEUE_CAP)
+        return false;
+    q-&gt;data[q-&gt;tail] = v;
+    q-&gt;tail = (q-&gt;tail + 1) % QUEUE_CAP;
+    q-&gt;size++;
+    return true;
+}
+
+static bool dequeue(struct Queue *q, int *out)
+{
+    if (q-&gt;size == 0)
+        return false;
+    *out = q-&gt;data[q-&gt;head];
+    q-&gt;head = (q-&gt;head + 1) % QUEUE_CAP;
+    q-&gt;size--;
+    return true;
+}
+
+int main(void)
+{
+    struct Queue q;
+    int v;
+    queue_init(&amp;q);
+    enqueue(&amp;q, 10);
+    enqueue(&amp;q, 20);
+    enqueue(&amp;q, 30);
+    dequeue(&amp;q, &amp;v);
+    printf("сняли %d\n", v);
+    enqueue(&amp;q, 40);
+    while (dequeue(&amp;q, &amp;v))
+        printf("%d ", v);
+    printf("\n");
+    return 0;
+}</code></pre></figure>
+<h2>Односвязный список</h2>
+<p>Узел хранит значение и указатель на следующий. Вставлять и удалять в голове можно за <code>O(1)</code>
+без сдвига остальных элементов (в отличие от массива). Плата — нет доступа по индексу за <code>O(1)</code>:
+чтобы дойти до <code>k</code>-го узла, нужно пройти <code>k</code> ссылок, а каждый узел требует отдельного
+<code>malloc</code>. Освобождать узлы нужно самому.</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+struct Node {
+    int value;
+    struct Node *next;
+};
+
+static struct Node *push_front(struct Node *head, int value)
+{
+    struct Node *n = malloc(sizeof *n);
+    if (!n)
+        return head;
+    n-&gt;value = value;
+    n-&gt;next = head;
+    return n;
+}
+
+static void print_list(const struct Node *head)
+{
+    for (const struct Node *p = head; p != NULL; p = p-&gt;next)
+        printf("%d ", p-&gt;value);
+    printf("\n");
+}
+
+static void free_list(struct Node *head)
+{
+    while (head) {
+        struct Node *n = head-&gt;next;
+        free(head);
+        head = n;
+    }
+}
+
+int main(void)
+{
+    struct Node *head = NULL;
+    head = push_front(head, 3);
+    head = push_front(head, 2);
+    head = push_front(head, 1);
+    print_list(head);    /* 1 2 3 */
+    free_list(head);
+    return 0;
+}</code></pre></figure>
+<div class="note">Двусвязный список добавляет указатель на предыдущий узел: проще удалять текущий элемент
+и идти в обе стороны, но узлы больше и аккуратнее надо обновлять две связи. На практике стек и очередь
+часто делают на массиве, а список — когда часто вставляют и удаляют в середине и размер заранее неизвестен.</div>
+<nav class="pager" aria-label="Соседние страницы"><a class="prev" href="../algorithms/primes.html">← Простые числа</a><a class="next" href="../mcu/index.html">Раздел (WIP) →</a></nav>
+</main>
+</div>
+<footer class="footer">
+<p>Справочник по языкам C и C++ — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+Подсветка: <a href="../assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="../assets/fonts/OFL.txt">OFL 1.1</a>).</p>
+</footer>
+<script src="../assets/js/prism.js"></script>
+</body>
+</html>

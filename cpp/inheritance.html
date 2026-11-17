@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Наследование и полиморфизм — Справочник по C</title>
+<meta name="description" content="Наследование в C++: public-наследование, виртуальные функции, полиморфизм, абстрактные классы и виртуальный деструктор.">
+<link rel="preload" href="../assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="../index.html"><span class="logo">C</span> Справочник по C</a>
+<span class="std">C11 · C17 · C++17</span>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Разделы">
+<p class="group">Начало</p><ul>
+<li><a href="../index.html">Главная</a></li>
+<li><a href="../getting-started/install-and-compile.html">Установка и компиляция</a></li>
+</ul>
+<p class="group">Основы</p><ul>
+<li><a href="../basics/syntax.html">Синтаксис и операторы</a></li>
+<li><a href="../basics/types-and-variables.html">Типы и переменные</a></li>
+<li><a href="../basics/control-flow.html">Управление потоком</a></li>
+</ul>
+<p class="group">Язык</p><ul>
+<li><a href="../language/functions.html">Функции</a></li>
+<li><a href="../language/arrays-and-strings.html">Массивы и строки</a></li>
+<li><a href="../language/pointers.html">Указатели</a></li>
+<li><a href="../language/memory.html">Память</a></li>
+<li><a href="../language/structs-unions-enums.html">Структуры и enum</a></li>
+<li><a href="../language/preprocessor.html">Препроцессор</a></li>
+</ul>
+<p class="group">Библиотека</p><ul>
+<li><a href="../library/stdlib.html">Стандартная библиотека</a></li>
+<li><a href="../library/file-io.html">Работа с файлами</a></li>
+</ul>
+<p class="group">C++</p><ul>
+<li><a href="../cpp/differences.html">Отличия от C</a></li>
+<li><a href="../cpp/references.html">Ссылки</a></li>
+<li><a href="../cpp/namespaces.html">Пространства имён</a></li>
+<li><a href="../cpp/overloading.html">Перегрузка функций</a></li>
+<li><a href="../cpp/classes.html">Классы и объекты</a></li>
+<li><a href="../cpp/inheritance.html" class="active" aria-current="page">Наследование</a></li>
+<li><a href="../cpp/operators.html">Перегрузка операторов</a></li>
+<li><a href="../cpp/templates.html">Шаблоны</a></li>
+<li><a href="../cpp/new-delete.html">new и delete</a></li>
+<li><a href="../cpp/exceptions.html">Исключения</a></li>
+<li><a href="../cpp/const-constexpr.html">const и constexpr</a></li>
+</ul>
+<p class="group">Алгоритмы</p><ul>
+<li><a href="../algorithms/complexity.html">Сложность (O-нотация)</a></li>
+<li><a href="../algorithms/search.html">Поиск</a></li>
+<li><a href="../algorithms/sorting.html">Сортировка</a></li>
+<li><a href="../algorithms/recursion.html">Рекурсия и НОД</a></li>
+<li><a href="../algorithms/primes.html">Простые числа</a></li>
+<li><a href="../algorithms/data-structures.html">Структуры данных</a></li>
+</ul>
+<p class="group">Микроконтроллеры</p><ul>
+<li><a href="../mcu/index.html">Раздел (WIP)</a></li>
+</ul>
+<p class="group">Практика</p><ul>
+<li><a href="../examples/index.html">Примеры программ</a></li>
+<li><a href="../faq.html">FAQ и глоссарий</a></li>
+</ul>
+</nav>
+<main>
+<h1>Наследование и полиморфизм</h1>
+<p><b>Наследование</b> строит новый класс на основе существующего. При <code>class Derived : public Base</code>
+открытый интерфейс базы остаётся открытым в наследнике: «Derived является Base».
+Это основной вид наследования для полиморфизма.</p>
+<figure class="code"><figcaption>C++</figcaption><pre><code class="language-cpp">#include &lt;cstdio&gt;
+
+class Animal {
+public:
+    explicit Animal(const char *name) : name_(name) {}
+
+    const char *name() const { return name_; }
+
+    void greet() const
+    {
+        std::printf("я %s\n", name_);
+    }
+
+protected:
+    const char *name_;
+};
+
+class Cat : public Animal {
+public:
+    explicit Cat(const char *name) : Animal(name) {}
+
+    void purr() const
+    {
+        std::printf("%s мурлычет\n", name_);
+    }
+};
+
+int main()
+{
+    Cat c{"Мурка"};
+    c.greet();
+    c.purr();
+    return 0;
+}</code></pre></figure>
+<h2>Виртуальные функции</h2>
+<p>Если метод объявлен как <code>virtual</code>, вызов через указатель или ссылку на <i>базовый</i> тип
+выбирает версию <i>фактического</i> объекта. Это и есть <b>полиморфизм</b> во время выполнения.
+В C++11 в наследнике пишут <code>override</code>: компилятор проверит, что в базе есть такая же виртуальная функция.</p>
+<figure class="code"><figcaption>C++</figcaption><pre><code class="language-cpp">#include &lt;cstdio&gt;
+
+class Shape {
+public:
+    virtual double area() const = 0;
+    virtual const char *kind() const { return "фигура"; }
+    virtual ~Shape() = default;
+};
+
+class Rect : public Shape {
+public:
+    Rect(double w, double h) : w_(w), h_(h) {}
+    double area() const override { return w_ * h_; }
+    const char *kind() const override { return "прямоугольник"; }
+
+private:
+    double w_, h_;
+};
+
+class Circle : public Shape {
+public:
+    explicit Circle(double r) : r_(r) {}
+    double area() const override { return 3.141592653589793 * r_ * r_; }
+    const char *kind() const override { return "круг"; }
+
+private:
+    double r_;
+};
+
+static void print_area(const Shape &amp;s)
+{
+    std::printf("%s: площадь %.2f\n", s.kind(), s.area());
+}
+
+int main()
+{
+    Rect r{3.0, 4.0};
+    Circle c{1.0};
+    print_area(r);
+    print_area(c);
+    return 0;
+}</code></pre></figure>
+<h2>Чисто виртуальные функции и абстрактные классы</h2>
+<p>Объявление <code>virtual double area() const = 0;</code> делает функцию <b>чисто виртуальной</b>,
+а класс — <b>абстрактным</b>: создать объект <code>Shape</code> нельзя, можно только наследовать и
+реализовать недостающие методы. Абстрактный класс удобен как общий интерфейс.</p>
+
+<h2>Виртуальный деструктор</h2>
+<p>Если объект производного класса удаляют через указатель на базу (<code>delete base;</code>),
+деструктор базы должен быть виртуальным. Иначе вызовется только деструктор базы, и часть ресурса
+наследника утечёт.</p>
+<figure class="code"><figcaption>C++</figcaption><pre><code class="language-cpp">#include &lt;cstdio&gt;
+
+class Base {
+public:
+    virtual ~Base() { std::printf(" ~Base\n"); }
+};
+
+class Named : public Base {
+public:
+    explicit Named(const char *n) : n_(n) { std::printf("Named(%s)\n", n_); }
+    ~Named() override { std::printf(" ~Named(%s)\n", n_); }
+
+private:
+    const char *n_;
+};
+
+int main()
+{
+    Base *p = new Named{"x"};
+    delete p;    // сначала ~Named, затем ~Base
+    return 0;
+}</code></pre></figure>
+<div class="warn">Присваивание производного объекта в переменную базового типа <i>срезает</i> объект
+(<i>object slicing</i>): остаются только поля базы. Для полиморфизма передавайте указатель или ссылку.</div>
+<div class="note"><code>final</code> на классе или методе запрещает дальнейшее наследование или переопределение.
+<code>protected</code> в базе полезен для методов и полей, которыми пользуется только иерархия, но не внешний код.</div>
+<nav class="pager" aria-label="Соседние страницы"><a class="prev" href="../cpp/classes.html">← Классы и объекты</a><a class="next" href="../cpp/operators.html">Перегрузка операторов →</a></nav>
+</main>
+</div>
+<footer class="footer">
+<p>Справочник по языкам C и C++ — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+Подсветка: <a href="../assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="../assets/fonts/OFL.txt">OFL 1.1</a>).</p>
+</footer>
+<script src="../assets/js/prism.js"></script>
+</body>
+</html>

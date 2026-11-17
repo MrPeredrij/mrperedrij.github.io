@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Перегрузка функций и аргументы по умолчанию — Справочник по C</title>
+<meta name="description" content="Перегрузка функций в C++ и аргументы по умолчанию: правила, ограничения и типичные неоднозначности.">
+<link rel="preload" href="../assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="../index.html"><span class="logo">C</span> Справочник по C</a>
+<span class="std">C11 · C17 · C++17</span>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Разделы">
+<p class="group">Начало</p><ul>
+<li><a href="../index.html">Главная</a></li>
+<li><a href="../getting-started/install-and-compile.html">Установка и компиляция</a></li>
+</ul>
+<p class="group">Основы</p><ul>
+<li><a href="../basics/syntax.html">Синтаксис и операторы</a></li>
+<li><a href="../basics/types-and-variables.html">Типы и переменные</a></li>
+<li><a href="../basics/control-flow.html">Управление потоком</a></li>
+</ul>
+<p class="group">Язык</p><ul>
+<li><a href="../language/functions.html">Функции</a></li>
+<li><a href="../language/arrays-and-strings.html">Массивы и строки</a></li>
+<li><a href="../language/pointers.html">Указатели</a></li>
+<li><a href="../language/memory.html">Память</a></li>
+<li><a href="../language/structs-unions-enums.html">Структуры и enum</a></li>
+<li><a href="../language/preprocessor.html">Препроцессор</a></li>
+</ul>
+<p class="group">Библиотека</p><ul>
+<li><a href="../library/stdlib.html">Стандартная библиотека</a></li>
+<li><a href="../library/file-io.html">Работа с файлами</a></li>
+</ul>
+<p class="group">C++</p><ul>
+<li><a href="../cpp/differences.html">Отличия от C</a></li>
+<li><a href="../cpp/references.html">Ссылки</a></li>
+<li><a href="../cpp/namespaces.html">Пространства имён</a></li>
+<li><a href="../cpp/overloading.html" class="active" aria-current="page">Перегрузка функций</a></li>
+<li><a href="../cpp/classes.html">Классы и объекты</a></li>
+<li><a href="../cpp/inheritance.html">Наследование</a></li>
+<li><a href="../cpp/operators.html">Перегрузка операторов</a></li>
+<li><a href="../cpp/templates.html">Шаблоны</a></li>
+<li><a href="../cpp/new-delete.html">new и delete</a></li>
+<li><a href="../cpp/exceptions.html">Исключения</a></li>
+<li><a href="../cpp/const-constexpr.html">const и constexpr</a></li>
+</ul>
+<p class="group">Алгоритмы</p><ul>
+<li><a href="../algorithms/complexity.html">Сложность (O-нотация)</a></li>
+<li><a href="../algorithms/search.html">Поиск</a></li>
+<li><a href="../algorithms/sorting.html">Сортировка</a></li>
+<li><a href="../algorithms/recursion.html">Рекурсия и НОД</a></li>
+<li><a href="../algorithms/primes.html">Простые числа</a></li>
+<li><a href="../algorithms/data-structures.html">Структуры данных</a></li>
+</ul>
+<p class="group">Микроконтроллеры</p><ul>
+<li><a href="../mcu/index.html">Раздел (WIP)</a></li>
+</ul>
+<p class="group">Практика</p><ul>
+<li><a href="../examples/index.html">Примеры программ</a></li>
+<li><a href="../faq.html">FAQ и глоссарий</a></li>
+</ul>
+</nav>
+<main>
+<h1>Перегрузка функций и аргументы по умолчанию</h1>
+<p>В C++ несколько функций могут иметь одно имя, если различаются числом или типами параметров.
+Компилятор выбирает подходящую версию по аргументам вызова. Только типом возвращаемого значения
+перегрузить функцию нельзя.</p>
+<figure class="code"><figcaption>C++</figcaption><pre><code class="language-cpp">#include &lt;cstdio&gt;
+
+static int abs_val(int x)
+{
+    return x &lt; 0 ? -x : x;
+}
+
+static double abs_val(double x)
+{
+    return x &lt; 0.0 ? -x : x;
+}
+
+static int max_val(int a, int b)
+{
+    return a &gt; b ? a : b;
+}
+
+static int max_val(int a, int b, int c)
+{
+    return max_val(max_val(a, b), c);
+}
+
+int main()
+{
+    std::printf("%d %.1f %d\n", abs_val(-7), abs_val(-2.5), max_val(1, 9, 3));
+    return 0;
+}</code></pre></figure>
+<h2>Аргументы по умолчанию</h2>
+<p>Значения по умолчанию указывают в объявлении, справа налево: нельзя задать значение для параметра,
+если у следующего его нет. В определении функции их обычно не повторяют.</p>
+<figure class="code"><figcaption>C++</figcaption><pre><code class="language-cpp">#include &lt;cstdio&gt;
+
+static void show(const char *name, int times = 1, char mark = '!')
+{
+    for (int i = 0; i &lt; times; ++i)
+        std::printf("%s%c\n", name, mark);
+}
+
+int main()
+{
+    show("раз");
+    show("два", 2);
+    show("три", 1, '?');
+    return 0;
+}</code></pre></figure>
+<h2>Как компилятор выбирает перегрузку</h2>
+<ol>
+<li>Точное совпадение типов (включая <code>T&amp;</code> и <code>const T&amp;</code> по правилам привязки).</li>
+<li>Стандартные преобразования (продвижение <code>short</code> к <code>int</code>, <code>int</code> к <code>double</code> и т. д.).</li>
+<li>Пользовательские преобразования (конструкторы и операторы преобразования).</li>
+</ol>
+<p>Если две кандидатуры одинаково хороши, программа не компилируется: вызов <i>неоднозначен</i>.
+Так бывает, когда перегрузка пересекается с аргументами по умолчанию.</p>
+<figure class="code"><figcaption>C++</figcaption><pre><code class="language-cpp">#include &lt;cstdio&gt;
+
+static void log_msg(const char *s)
+{
+    std::printf("str: %s\n", s);
+}
+
+static void log_msg(int n)
+{
+    std::printf("int: %d\n", n);
+}
+
+int main()
+{
+    log_msg("ok");
+    log_msg(10);
+    // log_msg('A');  // неоднозначно: char -&gt; int или (на некоторых перегрузках) другие пути
+    log_msg(static_cast&lt;int&gt;('A'));
+    return 0;
+}</code></pre></figure>
+<div class="warn">Не задавайте разным перегрузкам разный смысл «на грани»: <code>draw(int)</code> и
+<code>draw(bool)</code> легко вызвать случайно, потому что <code>true</code> превращается в <code>int</code>.
+Лучше разные имена или сильно различные типы.</div>
+<div class="note">Перегрузка и шаблоны работают вместе: если есть шаблон и обычная функция,
+компилятор предпочитает более конкретную обычную функцию при точном совпадении.</div>
+<nav class="pager" aria-label="Соседние страницы"><a class="prev" href="../cpp/namespaces.html">← Пространства имён</a><a class="next" href="../cpp/classes.html">Классы и объекты →</a></nav>
+</main>
+</div>
+<footer class="footer">
+<p>Справочник по языкам C и C++ — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+Подсветка: <a href="../assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="../assets/fonts/OFL.txt">OFL 1.1</a>).</p>
+</footer>
+<script src="../assets/js/prism.js"></script>
+</body>
+</html>

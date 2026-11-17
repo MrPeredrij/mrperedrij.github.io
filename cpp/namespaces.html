@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Пространства имён — Справочник по C</title>
+<meta name="description" content="Пространства имён C++: namespace, вложенность, using, анонимные пространства и разрешение имён.">
+<link rel="preload" href="../assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="../index.html"><span class="logo">C</span> Справочник по C</a>
+<span class="std">C11 · C17 · C++17</span>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Разделы">
+<p class="group">Начало</p><ul>
+<li><a href="../index.html">Главная</a></li>
+<li><a href="../getting-started/install-and-compile.html">Установка и компиляция</a></li>
+</ul>
+<p class="group">Основы</p><ul>
+<li><a href="../basics/syntax.html">Синтаксис и операторы</a></li>
+<li><a href="../basics/types-and-variables.html">Типы и переменные</a></li>
+<li><a href="../basics/control-flow.html">Управление потоком</a></li>
+</ul>
+<p class="group">Язык</p><ul>
+<li><a href="../language/functions.html">Функции</a></li>
+<li><a href="../language/arrays-and-strings.html">Массивы и строки</a></li>
+<li><a href="../language/pointers.html">Указатели</a></li>
+<li><a href="../language/memory.html">Память</a></li>
+<li><a href="../language/structs-unions-enums.html">Структуры и enum</a></li>
+<li><a href="../language/preprocessor.html">Препроцессор</a></li>
+</ul>
+<p class="group">Библиотека</p><ul>
+<li><a href="../library/stdlib.html">Стандартная библиотека</a></li>
+<li><a href="../library/file-io.html">Работа с файлами</a></li>
+</ul>
+<p class="group">C++</p><ul>
+<li><a href="../cpp/differences.html">Отличия от C</a></li>
+<li><a href="../cpp/references.html">Ссылки</a></li>
+<li><a href="../cpp/namespaces.html" class="active" aria-current="page">Пространства имён</a></li>
+<li><a href="../cpp/overloading.html">Перегрузка функций</a></li>
+<li><a href="../cpp/classes.html">Классы и объекты</a></li>
+<li><a href="../cpp/inheritance.html">Наследование</a></li>
+<li><a href="../cpp/operators.html">Перегрузка операторов</a></li>
+<li><a href="../cpp/templates.html">Шаблоны</a></li>
+<li><a href="../cpp/new-delete.html">new и delete</a></li>
+<li><a href="../cpp/exceptions.html">Исключения</a></li>
+<li><a href="../cpp/const-constexpr.html">const и constexpr</a></li>
+</ul>
+<p class="group">Алгоритмы</p><ul>
+<li><a href="../algorithms/complexity.html">Сложность (O-нотация)</a></li>
+<li><a href="../algorithms/search.html">Поиск</a></li>
+<li><a href="../algorithms/sorting.html">Сортировка</a></li>
+<li><a href="../algorithms/recursion.html">Рекурсия и НОД</a></li>
+<li><a href="../algorithms/primes.html">Простые числа</a></li>
+<li><a href="../algorithms/data-structures.html">Структуры данных</a></li>
+</ul>
+<p class="group">Микроконтроллеры</p><ul>
+<li><a href="../mcu/index.html">Раздел (WIP)</a></li>
+</ul>
+<p class="group">Практика</p><ul>
+<li><a href="../examples/index.html">Примеры программ</a></li>
+<li><a href="../faq.html">FAQ и глоссарий</a></li>
+</ul>
+</nav>
+<main>
+<h1>Пространства имён</h1>
+<p><b>Пространство имён</b> группирует имена, чтобы они не сталкивались в глобальной области.
+Стандартная библиотека C++ живёт в <code>std</code>: отсюда <code>std::printf</code> и <code>std::cout</code>.</p>
+<figure class="code"><figcaption>C++</figcaption><pre><code class="language-cpp">#include &lt;cstdio&gt;
+
+namespace math {
+int abs_int(int x)
+{
+    return x &lt; 0 ? -x : x;
+}
+
+namespace extra {
+int square(int x)
+{
+    return x * x;
+}
+}
+}
+
+int main()
+{
+    std::printf("%d %d\n", math::abs_int(-5), math::extra::square(4));
+    return 0;
+}</code></pre></figure>
+<h2>Директива и объявление using</h2>
+<p><code>using math::abs_int;</code> вводит одно имя в текущую область.
+<code>using namespace math;</code> вводит все имена пространства. Второе удобно в коротком <code>.cpp</code>,
+но в заголовках его избегают: подключивший заголовок внезапно получит десятки имён и риск неоднозначности.</p>
+<figure class="code"><figcaption>C++</figcaption><pre><code class="language-cpp">#include &lt;cstdio&gt;
+
+namespace geo {
+constexpr int origin[2] = { 0, 0 };
+
+int manhattan(int x, int y)
+{
+    int ax = x &lt; 0 ? -x : x;
+    int ay = y &lt; 0 ? -y : y;
+    return ax + ay;
+}
+}
+
+int main()
+{
+    using geo::manhattan;
+    std::printf("%d\n", manhattan(3, -4));
+    return 0;
+}</code></pre></figure>
+<h2>Анонимное пространство имён</h2>
+<p>Безымянный <code>namespace { ... }</code> даёт внутреннюю компоновку: имена видны только в этой единице
+трансляции. В C для той же цели используют <code>static</code> на функциях и переменных уровня файла.</p>
+<figure class="code"><figcaption>C++</figcaption><pre><code class="language-cpp">#include &lt;cstdio&gt;
+
+namespace {
+int counter = 0;
+
+void bump()
+{
+    ++counter;
+}
+}
+
+int main()
+{
+    bump();
+    bump();
+    std::printf("%d\n", counter);
+    return 0;
+}</code></pre></figure>
+<h2>Разрешение имён</h2>
+<ul>
+<li><code>::name</code> — искать в глобальной области, минуя одноимённые локальные объявления.</li>
+<li><code>ns::name</code> — квалифицированное имя.</li>
+<li>Пространство можно дописать позже: несколько блоков <code>namespace math { ... }</code> объединяются.</li>
+</ul>
+<div class="note">Аргумент-зависимое связывание (ADL): для <code>std::cout &lt;&lt; x</code> компилятор ищет
+<code>operator&lt;&lt;</code> в том числе в пространстве типа <code>x</code>. Поэтому перегрузку вывода
+обычно кладут в то же пространство, что и сам тип.</div>
+<nav class="pager" aria-label="Соседние страницы"><a class="prev" href="../cpp/references.html">← Ссылки</a><a class="next" href="../cpp/overloading.html">Перегрузка функций →</a></nav>
+</main>
+</div>
+<footer class="footer">
+<p>Справочник по языкам C и C++ — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+Подсветка: <a href="../assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="../assets/fonts/OFL.txt">OFL 1.1</a>).</p>
+</footer>
+<script src="../assets/js/prism.js"></script>
+</body>
+</html>

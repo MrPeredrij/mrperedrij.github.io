@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Справочник по языку C — Справочник по C</title>
-<meta name="description" content="Справочник по языку программирования C (C11/C17): синтаксис, типы, указатели, память, стандартная библиотека и примеры.">
+<meta name="description" content="Справочник по языкам C (C11/C17) и C++17: синтаксис, типы, указатели, классы, базовые алгоритмы и примеры.">
 <link rel="preload" href="assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="style.css">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
@@ -12,7 +12,7 @@
 <body>
 <header class="topbar">
 <a class="brand" href="index.html"><span class="logo">C</span> Справочник по C</a>
-<span class="std">C11 · C17</span>
+<span class="std">C11 · C17 · C++17</span>
 </header>
 <div class="layout">
 <nav class="sidebar" aria-label="Разделы">
@@ -37,6 +37,30 @@
 <li><a href="library/stdlib.html">Стандартная библиотека</a></li>
 <li><a href="library/file-io.html">Работа с файлами</a></li>
 </ul>
+<p class="group">C++</p><ul>
+<li><a href="cpp/differences.html">Отличия от C</a></li>
+<li><a href="cpp/references.html">Ссылки</a></li>
+<li><a href="cpp/namespaces.html">Пространства имён</a></li>
+<li><a href="cpp/overloading.html">Перегрузка функций</a></li>
+<li><a href="cpp/classes.html">Классы и объекты</a></li>
+<li><a href="cpp/inheritance.html">Наследование</a></li>
+<li><a href="cpp/operators.html">Перегрузка операторов</a></li>
+<li><a href="cpp/templates.html">Шаблоны</a></li>
+<li><a href="cpp/new-delete.html">new и delete</a></li>
+<li><a href="cpp/exceptions.html">Исключения</a></li>
+<li><a href="cpp/const-constexpr.html">const и constexpr</a></li>
+</ul>
+<p class="group">Алгоритмы</p><ul>
+<li><a href="algorithms/complexity.html">Сложность (O-нотация)</a></li>
+<li><a href="algorithms/search.html">Поиск</a></li>
+<li><a href="algorithms/sorting.html">Сортировка</a></li>
+<li><a href="algorithms/recursion.html">Рекурсия и НОД</a></li>
+<li><a href="algorithms/primes.html">Простые числа</a></li>
+<li><a href="algorithms/data-structures.html">Структуры данных</a></li>
+</ul>
+<p class="group">Микроконтроллеры</p><ul>
+<li><a href="mcu/index.html">Раздел (WIP)</a></li>
+</ul>
 <p class="group">Практика</p><ul>
 <li><a href="examples/index.html">Примеры программ</a></li>
 <li><a href="faq.html">FAQ и глоссарий</a></li>
@@ -45,9 +69,10 @@
 <main>
 <img class="hero" src="image.jpg" alt="Баннер справочника по языку C" width="1600" height="600">
 <h1>Справочник по языку C</h1>
-<p class="lead">Краткий практический справочник по языку программирования C по стандартам <b>C11</b> и <b>C17</b>.
-Каждый пример на сайте — законченный фрагмент, который компилируется командой
-<code>gcc -std=c17 -Wall -Wextra</code> без предупреждений.</p>
+<p class="lead">Краткий практический справочник по языку программирования C по стандартам <b>C11</b> и <b>C17</b>,
+с разделами по <b>C++17</b> и базовым алгоритмам.
+Примеры на C компилируются командой <code>gcc -std=c17 -Wall -Wextra</code>,
+примеры на C++ — командой <code>g++ -std=c++17 -Wall -Wextra</code> без предупреждений.</p>
 
 <h2>Что такое C</h2>
 <p>C — компилируемый язык общего назначения, созданный Деннисом Ритчи в Bell Labs в 1972 году для написания
@@ -93,6 +118,38 @@ int main(void)
 <a class="card" href="faq.html"><b>FAQ и глоссарий</b><span>Частые вопросы и термины</span></a>
 </div>
 
+<h2>Язык C++</h2>
+<p>Обзор возможностей C++17, которых нет в C. Стандартная библиотека шаблонов (STL) будет добавлена отдельным разделом позже.</p>
+<div class="cards">
+<a class="card" href="cpp/differences.html"><b>Отличия от C</b><span>Ключевые слова, типы, компиляция g++</span></a>
+<a class="card" href="cpp/references.html"><b>Ссылки</b><span>lvalue-ссылки, const, отличие от указателей</span></a>
+<a class="card" href="cpp/namespaces.html"><b>Пространства имён</b><span>namespace, using, анонимные пространства</span></a>
+<a class="card" href="cpp/overloading.html"><b>Перегрузка функций</b><span>Одинаковые имена, аргументы по умолчанию</span></a>
+<a class="card" href="cpp/classes.html"><b>Классы и объекты</b><span>Конструкторы, деструкторы, доступ</span></a>
+<a class="card" href="cpp/inheritance.html"><b>Наследование</b><span>virtual, полиморфизм, абстрактные классы</span></a>
+<a class="card" href="cpp/operators.html"><b>Перегрузка операторов</b><span>operator+, сравнение, присваивание</span></a>
+<a class="card" href="cpp/templates.html"><b>Шаблоны</b><span>Функции и классы с параметром-типом</span></a>
+<a class="card" href="cpp/new-delete.html"><b>new и delete</b><span>Динамические объекты и массивы</span></a>
+<a class="card" href="cpp/exceptions.html"><b>Исключения</b><span>throw, try, catch, раскрутка стека</span></a>
+<a class="card" href="cpp/const-constexpr.html"><b>const и constexpr</b><span>Константность и вычисления на этапе компиляции</span></a>
+</div>
+
+<h2>Базовые алгоритмы</h2>
+<p>Классические алгоритмы на C: оценка сложности, поиск, сортировки, рекурсия и простые структуры данных.</p>
+<div class="cards">
+<a class="card" href="algorithms/complexity.html"><b>Сложность алгоритмов</b><span>O-нотация, типичные классы сложности</span></a>
+<a class="card" href="algorithms/search.html"><b>Поиск</b><span>Линейный и двоичный поиск</span></a>
+<a class="card" href="algorithms/sorting.html"><b>Сортировка</b><span>Пузырёк, вставки, выбором, быстрая, слиянием</span></a>
+<a class="card" href="algorithms/recursion.html"><b>Рекурсия и НОД</b><span>Базовый случай, алгоритм Евклида</span></a>
+<a class="card" href="algorithms/primes.html"><b>Простые числа</b><span>Перебор делителей и решето Эратосфена</span></a>
+<a class="card" href="algorithms/data-structures.html"><b>Структуры данных</b><span>Стек, очередь и связный список на C</span></a>
+</div>
+
+<h2>Программирование микроконтроллеров</h2>
+<div class="cards">
+<a class="card" href="mcu/index.html"><b>Раздел в разработке / WIP</b><span>Заготовка под будущие материалы по МК</span></a>
+</div>
+
 <h2>О сайте</h2>
 <p>Сайт сделан как индивидуальный проект к лабораторной работе 2.1 «Настройка CDN для статического веб-сайта».
 Это набор однотипных HTML-страниц с общей таблицей стилей <code>style.css</code>, локальным подсветчиком
@@ -104,7 +161,7 @@ int main(void)
 </main>
 </div>
 <footer class="footer">
-<p>Справочник по языку C — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+<p>Справочник по языкам C и C++ — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
 Подсветка: <a href="assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="assets/fonts/OFL.txt">OFL 1.1</a>).</p>
 </footer>
 <script src="assets/js/prism.js"></script>

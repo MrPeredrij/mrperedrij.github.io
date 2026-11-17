@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>const и constexpr — Справочник по C</title>
+<meta name="description" content="const и constexpr в C++: константные объекты и методы, вычисления на этапе компиляции.">
+<link rel="preload" href="../assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="../index.html"><span class="logo">C</span> Справочник по C</a>
+<span class="std">C11 · C17 · C++17</span>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Разделы">
+<p class="group">Начало</p><ul>
+<li><a href="../index.html">Главная</a></li>
+<li><a href="../getting-started/install-and-compile.html">Установка и компиляция</a></li>
+</ul>
+<p class="group">Основы</p><ul>
+<li><a href="../basics/syntax.html">Синтаксис и операторы</a></li>
+<li><a href="../basics/types-and-variables.html">Типы и переменные</a></li>
+<li><a href="../basics/control-flow.html">Управление потоком</a></li>
+</ul>
+<p class="group">Язык</p><ul>
+<li><a href="../language/functions.html">Функции</a></li>
+<li><a href="../language/arrays-and-strings.html">Массивы и строки</a></li>
+<li><a href="../language/pointers.html">Указатели</a></li>
+<li><a href="../language/memory.html">Память</a></li>
+<li><a href="../language/structs-unions-enums.html">Структуры и enum</a></li>
+<li><a href="../language/preprocessor.html">Препроцессор</a></li>
+</ul>
+<p class="group">Библиотека</p><ul>
+<li><a href="../library/stdlib.html">Стандартная библиотека</a></li>
+<li><a href="../library/file-io.html">Работа с файлами</a></li>
+</ul>
+<p class="group">C++</p><ul>
+<li><a href="../cpp/differences.html">Отличия от C</a></li>
+<li><a href="../cpp/references.html">Ссылки</a></li>
+<li><a href="../cpp/namespaces.html">Пространства имён</a></li>
+<li><a href="../cpp/overloading.html">Перегрузка функций</a></li>
+<li><a href="../cpp/classes.html">Классы и объекты</a></li>
+<li><a href="../cpp/inheritance.html">Наследование</a></li>
+<li><a href="../cpp/operators.html">Перегрузка операторов</a></li>
+<li><a href="../cpp/templates.html">Шаблоны</a></li>
+<li><a href="../cpp/new-delete.html">new и delete</a></li>
+<li><a href="../cpp/exceptions.html">Исключения</a></li>
+<li><a href="../cpp/const-constexpr.html" class="active" aria-current="page">const и constexpr</a></li>
+</ul>
+<p class="group">Алгоритмы</p><ul>
+<li><a href="../algorithms/complexity.html">Сложность (O-нотация)</a></li>
+<li><a href="../algorithms/search.html">Поиск</a></li>
+<li><a href="../algorithms/sorting.html">Сортировка</a></li>
+<li><a href="../algorithms/recursion.html">Рекурсия и НОД</a></li>
+<li><a href="../algorithms/primes.html">Простые числа</a></li>
+<li><a href="../algorithms/data-structures.html">Структуры данных</a></li>
+</ul>
+<p class="group">Микроконтроллеры</p><ul>
+<li><a href="../mcu/index.html">Раздел (WIP)</a></li>
+</ul>
+<p class="group">Практика</p><ul>
+<li><a href="../examples/index.html">Примеры программ</a></li>
+<li><a href="../faq.html">FAQ и глоссарий</a></li>
+</ul>
+</nav>
+<main>
+<h1>const и constexpr</h1>
+<p><code>const</code> обещает, что объект не будут менять через это имя.
+<code>constexpr</code> идёт дальше: значение (или результат функции) должно быть доступно
+<b>на этапе компиляции</b>, если аргументы тоже константны.</p>
+
+<h2>const для объектов и указателей</h2>
+<p>Правила те же, что в C, и так же легко запутаться в месте <code>const</code>:</p>
+<table>
+<thead><tr><th>Запись</th><th>Смысл</th></tr></thead>
+<tbody>
+<tr><td><code>const int n = 5;</code> / <code>int const n = 5;</code></td><td>неизменяемое целое</td></tr>
+<tr><td><code>const int *p</code></td><td>указатель на константу: <code>*p</code> менять нельзя, <code>p</code> можно</td></tr>
+<tr><td><code>int *const p</code></td><td>константный указатель: адрес не меняется, значение по адресу можно</td></tr>
+<tr><td><code>const int *const p</code></td><td>нельзя ни то, ни другое</td></tr>
+</tbody>
+</table>
+
+<h2>Константные методы</h2>
+<p>Метод с <code>const</code> после списка параметров не меняет объект и может вызываться у константного
+объекта и через <code>const T&amp;</code>. Внутри такого метода <code>this</code> имеет тип <code>const T *</code>.</p>
+<figure class="code"><figcaption>C++</figcaption><pre><code class="language-cpp">#include &lt;cstdio&gt;
+
+class Rect {
+public:
+    Rect(int w, int h) : w_(w), h_(h) {}
+
+    int area() const { return w_ * h_; }
+    int width() const { return w_; }
+
+    void scale(int k) { w_ *= k; h_ *= k; }
+
+private:
+    int w_, h_;
+};
+
+static void print_area(const Rect &amp;r)
+{
+    std::printf("площадь %d\n", r.area());
+    // r.scale(2);  // нельзя: метод не const
+}
+
+int main()
+{
+    Rect r{3, 4};
+    print_area(r);
+    r.scale(2);
+    print_area(r);
+    return 0;
+}</code></pre></figure>
+<h2>constexpr</h2>
+<p>Переменная <code>constexpr</code> всегда инициализируется константным выражением и неявно <code>const</code>.
+Функция <code>constexpr</code> может вызываться и в обычном коде, и там, где нужна константа компиляции
+(размер массива, аргумент шаблона, <code>static_assert</code>). В C++14/17 тело такой функции может содержать
+обычные локальные переменные и циклы — лишь бы при константных аргументах результат считался на этапе компиляции.</p>
+<figure class="code"><figcaption>C++</figcaption><pre><code class="language-cpp">#include &lt;cstdio&gt;
+
+constexpr int square(int x)
+{
+    return x * x;
+}
+
+constexpr int pow_int(int base, int exp)
+{
+    int r = 1;
+    for (int i = 0; i &lt; exp; ++i)
+        r *= base;
+    return r;
+}
+
+static_assert(square(5) == 25, "square");
+static_assert(pow_int(2, 10) == 1024, "pow");
+
+int main()
+{
+    int data[square(3)];          // размер известен компилятору: 9
+    data[0] = pow_int(3, 3);      // здесь уже можно посчитать и в рантайме
+    std::printf("n = %d, 3^3 = %d\n", static_cast&lt;int&gt;(sizeof data / sizeof data[0]), data[0]);
+    return 0;
+}</code></pre></figure>
+<h2>Чем заменить макрос</h2>
+<table>
+<thead><tr><th>Инструмент</th><th>Когда использовать</th></tr></thead>
+<tbody>
+<tr><td><code>#define PI 3.14</code></td><td>В C++ почти никогда: нет области видимости и типа</td></tr>
+<tr><td><code>const double pi = 3.14;</code></td><td>Значение известно, но не обязано быть константой компиляции во всех контекстах</td></tr>
+<tr><td><code>constexpr double pi = 3.141592653589793;</code></td><td>Предпочтительный способ для констант</td></tr>
+<tr><td><code>enum { N = 16 };</code></td><td>Целые константы, особенно в старом коде</td></tr>
+</tbody>
+</table>
+<div class="note">C++20 добавил <code>consteval</code> (функция только для этапа компиляции) и
+<code>constinit</code> (статическая инициализация без обязательной константности потом).
+Для C++17 достаточно уверенно пользоваться <code>const</code> и <code>constexpr</code>.</div>
+<nav class="pager" aria-label="Соседние страницы"><a class="prev" href="../cpp/exceptions.html">← Исключения</a><a class="next" href="../algorithms/complexity.html">Сложность (O-нотация) →</a></nav>
+</main>
+</div>
+<footer class="footer">
+<p>Справочник по языкам C и C++ — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+Подсветка: <a href="../assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="../assets/fonts/OFL.txt">OFL 1.1</a>).</p>
+</footer>
+<script src="../assets/js/prism.js"></script>
+</body>
+</html>

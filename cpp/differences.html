@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Отличия C++ от C — Справочник по C</title>
+<meta name="description" content="Чем C++17 отличается от C: ключевые слова, типы, компиляция, совместимость и то, чего в C нет.">
+<link rel="preload" href="../assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="../index.html"><span class="logo">C</span> Справочник по C</a>
+<span class="std">C11 · C17 · C++17</span>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Разделы">
+<p class="group">Начало</p><ul>
+<li><a href="../index.html">Главная</a></li>
+<li><a href="../getting-started/install-and-compile.html">Установка и компиляция</a></li>
+</ul>
+<p class="group">Основы</p><ul>
+<li><a href="../basics/syntax.html">Синтаксис и операторы</a></li>
+<li><a href="../basics/types-and-variables.html">Типы и переменные</a></li>
+<li><a href="../basics/control-flow.html">Управление потоком</a></li>
+</ul>
+<p class="group">Язык</p><ul>
+<li><a href="../language/functions.html">Функции</a></li>
+<li><a href="../language/arrays-and-strings.html">Массивы и строки</a></li>
+<li><a href="../language/pointers.html">Указатели</a></li>
+<li><a href="../language/memory.html">Память</a></li>
+<li><a href="../language/structs-unions-enums.html">Структуры и enum</a></li>
+<li><a href="../language/preprocessor.html">Препроцессор</a></li>
+</ul>
+<p class="group">Библиотека</p><ul>
+<li><a href="../library/stdlib.html">Стандартная библиотека</a></li>
+<li><a href="../library/file-io.html">Работа с файлами</a></li>
+</ul>
+<p class="group">C++</p><ul>
+<li><a href="../cpp/differences.html" class="active" aria-current="page">Отличия от C</a></li>
+<li><a href="../cpp/references.html">Ссылки</a></li>
+<li><a href="../cpp/namespaces.html">Пространства имён</a></li>
+<li><a href="../cpp/overloading.html">Перегрузка функций</a></li>
+<li><a href="../cpp/classes.html">Классы и объекты</a></li>
+<li><a href="../cpp/inheritance.html">Наследование</a></li>
+<li><a href="../cpp/operators.html">Перегрузка операторов</a></li>
+<li><a href="../cpp/templates.html">Шаблоны</a></li>
+<li><a href="../cpp/new-delete.html">new и delete</a></li>
+<li><a href="../cpp/exceptions.html">Исключения</a></li>
+<li><a href="../cpp/const-constexpr.html">const и constexpr</a></li>
+</ul>
+<p class="group">Алгоритмы</p><ul>
+<li><a href="../algorithms/complexity.html">Сложность (O-нотация)</a></li>
+<li><a href="../algorithms/search.html">Поиск</a></li>
+<li><a href="../algorithms/sorting.html">Сортировка</a></li>
+<li><a href="../algorithms/recursion.html">Рекурсия и НОД</a></li>
+<li><a href="../algorithms/primes.html">Простые числа</a></li>
+<li><a href="../algorithms/data-structures.html">Структуры данных</a></li>
+</ul>
+<p class="group">Микроконтроллеры</p><ul>
+<li><a href="../mcu/index.html">Раздел (WIP)</a></li>
+</ul>
+<p class="group">Практика</p><ul>
+<li><a href="../examples/index.html">Примеры программ</a></li>
+<li><a href="../faq.html">FAQ и глоссарий</a></li>
+</ul>
+</nav>
+<main>
+<h1>Отличия C++ от C</h1>
+<p>C++ вырос из C и до сих пор может использовать большую часть его синтаксиса и библиотеки
+(<code>&lt;cstdio&gt;</code>, <code>&lt;cstring&gt;</code> и т. д.). Это не строгий суперсет:
+некоторые конструкции C в C++ недопустимы, а ряд имён в C++ — ключевые слова.</p>
+<p>Примеры в этом разделе собираются так:</p>
+<figure class="code"><figcaption>Терминал</figcaption><pre><code class="language-bash">g++ -std=c++17 -Wall -Wextra -pedantic -o prog prog.cpp
+./prog</code></pre></figure>
+<h2>Первая программа</h2>
+<p>В C++ принято писать ввод-вывод через <code>&lt;iostream&gt;</code>, хотя <code>printf</code> по-прежнему доступен.
+Функция <code>main</code> может быть записана как <code>int main()</code> — в C++ пустые скобки означают
+«параметров нет», в отличие от C17, где для этого нужно <code>(void)</code>.</p>
+<figure class="code"><figcaption>C++</figcaption><pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main()
+{
+    std::cout &lt;&lt; "Привет, C++!\n";
+    return 0;
+}</code></pre></figure>
+<h2>Что появляется в C++</h2>
+<table>
+<thead><tr><th>Возможность</th><th>Кратко</th></tr></thead>
+<tbody>
+<tr><td>Ссылки</td><td>Альтернатива указателям для передачи объекта в функцию, см. <a href="../cpp/references.html">Ссылки</a></td></tr>
+<tr><td>Пространства имён</td><td>Имена не обязаны жить в одной глобальной области, см. <a href="../cpp/namespaces.html">Пространства имён</a></td></tr>
+<tr><td>Перегрузка функций и аргументы по умолчанию</td><td>Одно имя — несколько сигнатур, см. <a href="../cpp/overloading.html">Перегрузка функций</a></td></tr>
+<tr><td>Классы</td><td>Данные и методы вместе, конструкторы и деструкторы, см. <a href="../cpp/classes.html">Классы и объекты</a></td></tr>
+<tr><td>Наследование и виртуальные функции</td><td>Полиморфизм во время выполнения, см. <a href="../cpp/inheritance.html">Наследование</a></td></tr>
+<tr><td>Перегрузка операторов</td><td><code>+</code>, <code>==</code>, <code>&lt;&lt;</code> для своих типов, см. <a href="../cpp/operators.html">Перегрузка операторов</a></td></tr>
+<tr><td>Шаблоны</td><td>Один алгоритм для разных типов, см. <a href="../cpp/templates.html">Шаблоны</a></td></tr>
+<tr><td><code>new</code> / <code>delete</code></td><td>Динамические объекты с вызовом конструктора, см. <a href="../cpp/new-delete.html">new и delete</a></td></tr>
+<tr><td>Исключения</td><td><code>throw</code> / <code>try</code> / <code>catch</code>, см. <a href="../cpp/exceptions.html">Исключения</a></td></tr>
+<tr><td><code>constexpr</code></td><td>Вычисления на этапе компиляции, см. <a href="../cpp/const-constexpr.html">const и constexpr</a></td></tr>
+</tbody>
+</table>
+<div class="note">Стандартная библиотека шаблонов (контейнеры вроде <code>std::vector</code>, итераторы, <code>&lt;algorithm&gt;</code>)
+в этот справочник пока не входит — отдельный раздел будет добавлен позже.</div>
+
+<h2>Типы и литералы</h2>
+<ul>
+<li><code>bool</code> — полноценный тип со значениями <code>true</code> и <code>false</code> (в C для этого есть <code>_Bool</code> и <code>&lt;stdbool.h&gt;</code>).</li>
+<li><code>nullptr</code> (C++11) — нулевой указатель. Предпочтительнее, чем <code>NULL</code> или <code>0</code>.</li>
+<li>Символьные типы <code>char16_t</code>, <code>char32_t</code>, с C++20 ещё <code>char8_t</code>.</li>
+<li>Ссылки <code>T&amp;</code> и <code>const T&amp;</code> — отдельных типов-ссылок в C нет.</li>
+</ul>
+<figure class="code"><figcaption>C++</figcaption><pre><code class="language-cpp">#include &lt;cstdio&gt;
+
+int main()
+{
+    bool ok = true;
+    int *p = nullptr;
+    if (ok &amp;&amp; p == nullptr)
+        std::printf("ok, указатель пуст\n");
+    return 0;
+}</code></pre></figure>
+<h2>Более строгая проверка типов</h2>
+<p>C++ не позволяет неявно преобразовать <code>void *</code> к другому указателю — в C это обычная практика с
+<code>malloc</code>. Функция без параметров записывается <code>f()</code> или <code>f(void)</code> одинаково.
+Несколько объявлений одной функции с разными параметрами — это уже перегрузка, а не «старый стиль» C.</p>
+<figure class="code"><figcaption>C++</figcaption><pre><code class="language-cpp">#include &lt;cstdio&gt;
+#include &lt;cstdlib&gt;
+
+int main()
+{
+    // В C хватило бы: int *p = malloc(n * sizeof(int));
+    int *p = static_cast&lt;int *&gt;(std::malloc(4 * sizeof(int)));
+    if (!p)
+        return 1;
+    p[0] = 42;
+    std::printf("%d\n", p[0]);
+    std::free(p);
+    return 0;
+}</code></pre></figure>
+<h2>Совместимость и расхождения</h2>
+<table>
+<thead><tr><th>Тема</th><th>C17</th><th>C++17</th></tr></thead>
+<tbody>
+<tr><td>Пустой список параметров</td><td><code>int f();</code> — параметры неизвестны</td><td><code>int f();</code> — параметров нет</td></tr>
+<tr><td>Ключевые слова</td><td><code>new</code>, <code>class</code>, <code>template</code> можно использовать как имена</td><td>Это ключевые слова</td></tr>
+<tr><td>VLA (массив переменной длины)</td><td>Есть в C99 (в C11 опционально)</td><td>Нет в стандарте</td></tr>
+<tr><td>Дизайн-инициализаторы</td><td><code>.x = 1</code> с C99</td><td>Полностью — с C++20</td></tr>
+<tr><td>Вызов конструктора</td><td>Нет</td><td><code>new</code> и автоматические объекты вызывают конструктор</td></tr>
+<tr><td>Компоновка с C</td><td>—</td><td><code>extern "C"</code> отключает декорирование имён</td></tr>
+</tbody>
+</table>
+<figure class="code"><figcaption>c_api.hpp</figcaption><pre><code class="language-cpp">/* c_api.hpp */
+#ifndef C_API_HPP
+#define C_API_HPP
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+int add(int a, int b);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif</code></pre></figure>
+<div class="note">Обёртка <code>extern "C"</code> нужна, когда заголовок подключают и из C, и из C++:
+компилятор C++ иначе «украшает» имена функций (name mangling), и компоновщик не найдёт символ,
+собранный компилятором C.</div>
+<div class="warn">Компилируйте C как C, а C++ как C++. Файл с классами, ссылками или <code>new</code>
+нельзя собрать командой <code>gcc -std=c17</code>.</div>
+<nav class="pager" aria-label="Соседние страницы"><a class="prev" href="../library/file-io.html">← Работа с файлами</a><a class="next" href="../cpp/references.html">Ссылки →</a></nav>
+</main>
+</div>
+<footer class="footer">
+<p>Справочник по языкам C и C++ — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+Подсветка: <a href="../assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="../assets/fonts/OFL.txt">OFL 1.1</a>).</p>
+</footer>
+<script src="../assets/js/prism.js"></script>
+</body>
+</html>

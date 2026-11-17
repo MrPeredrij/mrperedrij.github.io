@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Сложность алгоритмов — Справочник по C</title>
+<meta name="description" content="Введение в O-нотацию: типичные классы сложности, лучший и худший случай, оценка по времени и памяти.">
+<link rel="preload" href="../assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="../index.html"><span class="logo">C</span> Справочник по C</a>
+<span class="std">C11 · C17 · C++17</span>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Разделы">
+<p class="group">Начало</p><ul>
+<li><a href="../index.html">Главная</a></li>
+<li><a href="../getting-started/install-and-compile.html">Установка и компиляция</a></li>
+</ul>
+<p class="group">Основы</p><ul>
+<li><a href="../basics/syntax.html">Синтаксис и операторы</a></li>
+<li><a href="../basics/types-and-variables.html">Типы и переменные</a></li>
+<li><a href="../basics/control-flow.html">Управление потоком</a></li>
+</ul>
+<p class="group">Язык</p><ul>
+<li><a href="../language/functions.html">Функции</a></li>
+<li><a href="../language/arrays-and-strings.html">Массивы и строки</a></li>
+<li><a href="../language/pointers.html">Указатели</a></li>
+<li><a href="../language/memory.html">Память</a></li>
+<li><a href="../language/structs-unions-enums.html">Структуры и enum</a></li>
+<li><a href="../language/preprocessor.html">Препроцессор</a></li>
+</ul>
+<p class="group">Библиотека</p><ul>
+<li><a href="../library/stdlib.html">Стандартная библиотека</a></li>
+<li><a href="../library/file-io.html">Работа с файлами</a></li>
+</ul>
+<p class="group">C++</p><ul>
+<li><a href="../cpp/differences.html">Отличия от C</a></li>
+<li><a href="../cpp/references.html">Ссылки</a></li>
+<li><a href="../cpp/namespaces.html">Пространства имён</a></li>
+<li><a href="../cpp/overloading.html">Перегрузка функций</a></li>
+<li><a href="../cpp/classes.html">Классы и объекты</a></li>
+<li><a href="../cpp/inheritance.html">Наследование</a></li>
+<li><a href="../cpp/operators.html">Перегрузка операторов</a></li>
+<li><a href="../cpp/templates.html">Шаблоны</a></li>
+<li><a href="../cpp/new-delete.html">new и delete</a></li>
+<li><a href="../cpp/exceptions.html">Исключения</a></li>
+<li><a href="../cpp/const-constexpr.html">const и constexpr</a></li>
+</ul>
+<p class="group">Алгоритмы</p><ul>
+<li><a href="../algorithms/complexity.html" class="active" aria-current="page">Сложность (O-нотация)</a></li>
+<li><a href="../algorithms/search.html">Поиск</a></li>
+<li><a href="../algorithms/sorting.html">Сортировка</a></li>
+<li><a href="../algorithms/recursion.html">Рекурсия и НОД</a></li>
+<li><a href="../algorithms/primes.html">Простые числа</a></li>
+<li><a href="../algorithms/data-structures.html">Структуры данных</a></li>
+</ul>
+<p class="group">Микроконтроллеры</p><ul>
+<li><a href="../mcu/index.html">Раздел (WIP)</a></li>
+</ul>
+<p class="group">Практика</p><ul>
+<li><a href="../examples/index.html">Примеры программ</a></li>
+<li><a href="../faq.html">FAQ и глоссарий</a></li>
+</ul>
+</nav>
+<main>
+<h1>Сложность алгоритмов</h1>
+<p>Оценка сложности отвечает на вопрос: как растёт время работы (и расход памяти), когда вход становится больше.
+Для этого используют <b>O-нотацию</b> (читай «о большое»). Запись <code>O(n)</code> означает:
+существует константа <code>c</code> такая, что при достаточно больших <code>n</code> время не превосходит
+<code>c · n</code>. Константы и младшие слагаемые отбрасывают: <code>3n + 10</code> и <code>n / 2</code>
+оба есть <code>O(n)</code>.</p>
+
+<h2>Типичные классы</h2>
+<table>
+<thead><tr><th>Класс</th><th>Название</th><th>Пример</th><th>При n = 10<sup>6</sup></th></tr></thead>
+<tbody>
+<tr><td><code>O(1)</code></td><td>константное</td><td>доступ к элементу массива по индексу</td><td>мгновенно</td></tr>
+<tr><td><code>O(log n)</code></td><td>логарифмическое</td><td>двоичный поиск</td><td>около 20 шагов</td></tr>
+<tr><td><code>O(n)</code></td><td>линейное</td><td>просмотр массива, линейный поиск</td><td>миллион шагов</td></tr>
+<tr><td><code>O(n log n)</code></td><td>линейно-логарифмическое</td><td>сортировка слиянием, быстрая в среднем</td><td>около 2·10<sup>7</sup> шагов</td></tr>
+<tr><td><code>O(n<sup>2</sup>)</code></td><td>квадратичное</td><td>пузырёк, вставки, выбором</td><td>10<sup>12</sup> — уже нереально</td></tr>
+<tr><td><code>O(2<sup>n</sup>)</code></td><td>экспоненциальное</td><td>наивный рекурсивный Фибоначчи</td><td>не считается даже при небольших n</td></tr>
+</tbody>
+</table>
+<p>Логарифм в анализе алгоритмов обычно двоичный: каждый шаг отбрасывает половину данных.
+Разница между <code>O(n)</code> и <code>O(n<sup>2</sup>)</code> важнее, чем «насколько аккуратно написан цикл»:
+при росте <code>n</code> более высокий класс рано или поздно обгонит любой постоянный множитель.</p>
+
+<h2>Лучший, средний и худший случай</h2>
+<p>Один и тот же алгоритм ведёт себя по-разному на разных входах. Линейный поиск в среднем просматривает
+половину массива, но в худшем случае — все элементы: и то и другое есть <code>O(n)</code>.
+Быстрая сортировка в среднем <code>O(n log n)</code>, в худшем (неудачные опорные элементы) —
+<code>O(n<sup>2</sup>)</code>. Когда пишут «сложность алгоритма», чаще имеют в виду <b>худший</b> случай,
+если не оговорено иное.</p>
+<figure class="code"><figcaption>C</figcaption><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+static int linear_search(const int *a, int n, int key, int *cmp)
+{
+    for (int i = 0; i &lt; n; i++) {
+        (*cmp)++;
+        if (a[i] == key)
+            return i;
+    }
+    return -1;
+}
+
+int main(void)
+{
+    int a[] = { 2, 4, 6, 8, 10, 12, 14, 16 };
+    int n = (int)(sizeof a / sizeof a[0]);
+    int cmp = 0;
+    int i = linear_search(a, n, 10, &amp;cmp);
+    printf("индекс = %d, сравнений = %d, n = %d\n", i, cmp, n);
+    return 0;
+}</code></pre></figure>
+<h2>Память</h2>
+<p>Аналогично оценивают дополнительную память. Сортировка выбором переставляет элементы на месте:
+дополнительно <code>O(1)</code> ячеек. Сортировка слиянием обычно нуждается во временном массиве
+длины <code>n</code>: это <code>O(n)</code> по памяти. Рекурсия тоже занимает память — по глубине
+стека вызовов.</p>
+<div class="note">O-нотация описывает рост, а не секунды на вашем процессоре. Для маленьких <code>n</code>
+простой квадратичный алгоритм иногда быстрее «сложного» из-за маленьких постоянных множителей
+и лучшей работы с кэшем. Сначала выбирают подходящий класс сложности, затем измеряют, если это важно.</div>
+<nav class="pager" aria-label="Соседние страницы"><a class="prev" href="../cpp/const-constexpr.html">← const и constexpr</a><a class="next" href="../algorithms/search.html">Поиск →</a></nav>
+</main>
+</div>
+<footer class="footer">
+<p>Справочник по языкам C и C++ — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+Подсветка: <a href="../assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="../assets/fonts/OFL.txt">OFL 1.1</a>).</p>
+</footer>
+<script src="../assets/js/prism.js"></script>
+</body>
+</html>

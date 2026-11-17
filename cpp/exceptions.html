@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Исключения — Справочник по C</title>
+<meta name="description" content="Основы исключений C++: throw, try, catch, раскрутка стека и правила безопасного использования.">
+<link rel="preload" href="../assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="../index.html"><span class="logo">C</span> Справочник по C</a>
+<span class="std">C11 · C17 · C++17</span>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Разделы">
+<p class="group">Начало</p><ul>
+<li><a href="../index.html">Главная</a></li>
+<li><a href="../getting-started/install-and-compile.html">Установка и компиляция</a></li>
+</ul>
+<p class="group">Основы</p><ul>
+<li><a href="../basics/syntax.html">Синтаксис и операторы</a></li>
+<li><a href="../basics/types-and-variables.html">Типы и переменные</a></li>
+<li><a href="../basics/control-flow.html">Управление потоком</a></li>
+</ul>
+<p class="group">Язык</p><ul>
+<li><a href="../language/functions.html">Функции</a></li>
+<li><a href="../language/arrays-and-strings.html">Массивы и строки</a></li>
+<li><a href="../language/pointers.html">Указатели</a></li>
+<li><a href="../language/memory.html">Память</a></li>
+<li><a href="../language/structs-unions-enums.html">Структуры и enum</a></li>
+<li><a href="../language/preprocessor.html">Препроцессор</a></li>
+</ul>
+<p class="group">Библиотека</p><ul>
+<li><a href="../library/stdlib.html">Стандартная библиотека</a></li>
+<li><a href="../library/file-io.html">Работа с файлами</a></li>
+</ul>
+<p class="group">C++</p><ul>
+<li><a href="../cpp/differences.html">Отличия от C</a></li>
+<li><a href="../cpp/references.html">Ссылки</a></li>
+<li><a href="../cpp/namespaces.html">Пространства имён</a></li>
+<li><a href="../cpp/overloading.html">Перегрузка функций</a></li>
+<li><a href="../cpp/classes.html">Классы и объекты</a></li>
+<li><a href="../cpp/inheritance.html">Наследование</a></li>
+<li><a href="../cpp/operators.html">Перегрузка операторов</a></li>
+<li><a href="../cpp/templates.html">Шаблоны</a></li>
+<li><a href="../cpp/new-delete.html">new и delete</a></li>
+<li><a href="../cpp/exceptions.html" class="active" aria-current="page">Исключения</a></li>
+<li><a href="../cpp/const-constexpr.html">const и constexpr</a></li>
+</ul>
+<p class="group">Алгоритмы</p><ul>
+<li><a href="../algorithms/complexity.html">Сложность (O-нотация)</a></li>
+<li><a href="../algorithms/search.html">Поиск</a></li>
+<li><a href="../algorithms/sorting.html">Сортировка</a></li>
+<li><a href="../algorithms/recursion.html">Рекурсия и НОД</a></li>
+<li><a href="../algorithms/primes.html">Простые числа</a></li>
+<li><a href="../algorithms/data-structures.html">Структуры данных</a></li>
+</ul>
+<p class="group">Микроконтроллеры</p><ul>
+<li><a href="../mcu/index.html">Раздел (WIP)</a></li>
+</ul>
+<p class="group">Практика</p><ul>
+<li><a href="../examples/index.html">Примеры программ</a></li>
+<li><a href="../faq.html">FAQ и глоссарий</a></li>
+</ul>
+</nav>
+<main>
+<h1>Исключения</h1>
+<p><b>Исключение</b> — способ сообщить об ошибке, не заворачивая каждый вызов в проверку кода возврата.
+Оператор <code>throw</code> создаёт исключение. Блок <code>try</code> защищает участок кода,
+<code>catch</code> перехватывает объект подходящего типа. Если подходящего <code>catch</code> нет,
+программа завершается.</p>
+<figure class="code"><figcaption>C++</figcaption><pre><code class="language-cpp">#include &lt;cstdio&gt;
+
+struct Error {
+    const char *message;
+};
+
+static int divide(int a, int b)
+{
+    if (b == 0)
+        throw Error{"деление на ноль"};
+    return a / b;
+}
+
+int main()
+{
+    try {
+        std::printf("%d\n", divide(10, 2));
+        std::printf("%d\n", divide(10, 0));
+        std::printf("эта строка не выполнится\n");
+    } catch (const Error &amp;e) {
+        std::printf("ошибка: %s\n", e.message);
+    }
+    std::printf("программа продолжает работу\n");
+    return 0;
+}</code></pre></figure>
+<h2>Раскрутка стека</h2>
+<p>При <code>throw</code> C++ уничтожает автоматические объекты в уже начатых блоках (вызывает деструкторы)
+пока не найдёт подходящий <code>catch</code>. Это <b>раскрутка стека</b> (<i>stack unwinding</i>).
+Поэтому ресурсы, захваченные в объекте с деструктором, освободятся сами. Голый <code>new</code> без
+владельца при исключении утечёт.</p>
+
+<h2>Правила catch</h2>
+<ul>
+<li>Полиморфные типы и крупные объекты ловите по <code>const T&amp;</code>, чтобы не копировать и не «срезать» объект.</li>
+<li>Порядок блоков важен: сначала частные типы, потом более общие. <code>catch (...)</code> перехватывает всё и ставится последним.</li>
+<li>Не бросайте исключения из деструктора: во время раскрутки второе исключение завершит программу.</li>
+</ul>
+<figure class="code"><figcaption>C++</figcaption><pre><code class="language-cpp">#include &lt;cstdio&gt;
+
+class Guard {
+public:
+    explicit Guard(const char *n) : n_(n) { std::printf(" +%s\n", n_); }
+    ~Guard() { std::printf(" -%s\n", n_); }
+
+private:
+    const char *n_;
+};
+
+static void inner()
+{
+    Guard g{"inner"};
+    throw 42;
+}
+
+int main()
+{
+    try {
+        Guard g{"outer"};
+        inner();
+    } catch (int code) {
+        std::printf("перехвачен код %d\n", code);
+    }
+    return 0;
+}</code></pre></figure>
+<div class="note">Функцию, которая точно не бросает исключений, можно пометить <code>noexcept</code>.
+Это подсказка компилятору и контракт: если исключение всё же вылетит, программа завершится.</div>
+<div class="warn">Исключения — для редких ошибок, а не для обычного управления потоком
+(«нашли элемент — бросили»). В конструкторе исключение — нормальный способ сказать «объект создать не удалось»;
+частично созданный объект при этом уничтожается корректно, если каждый член сам владеет своим ресурсом.</div>
+<nav class="pager" aria-label="Соседние страницы"><a class="prev" href="../cpp/new-delete.html">← new и delete</a><a class="next" href="../cpp/const-constexpr.html">const и constexpr →</a></nav>
+</main>
+</div>
+<footer class="footer">
+<p>Справочник по языкам C и C++ — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+Подсветка: <a href="../assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="../assets/fonts/OFL.txt">OFL 1.1</a>).</p>
+</footer>
+<script src="../assets/js/prism.js"></script>
+</body>
+</html>

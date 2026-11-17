@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Программирование микроконтроллеров — Справочник по C</title>
+<meta name="description" content="Раздел о программировании микроконтроллеров пока в разработке.">
+<link rel="preload" href="../assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="../index.html"><span class="logo">C</span> Справочник по C</a>
+<span class="std">C11 · C17 · C++17</span>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Разделы">
+<p class="group">Начало</p><ul>
+<li><a href="../index.html">Главная</a></li>
+<li><a href="../getting-started/install-and-compile.html">Установка и компиляция</a></li>
+</ul>
+<p class="group">Основы</p><ul>
+<li><a href="../basics/syntax.html">Синтаксис и операторы</a></li>
+<li><a href="../basics/types-and-variables.html">Типы и переменные</a></li>
+<li><a href="../basics/control-flow.html">Управление потоком</a></li>
+</ul>
+<p class="group">Язык</p><ul>
+<li><a href="../language/functions.html">Функции</a></li>
+<li><a href="../language/arrays-and-strings.html">Массивы и строки</a></li>
+<li><a href="../language/pointers.html">Указатели</a></li>
+<li><a href="../language/memory.html">Память</a></li>
+<li><a href="../language/structs-unions-enums.html">Структуры и enum</a></li>
+<li><a href="../language/preprocessor.html">Препроцессор</a></li>
+</ul>
+<p class="group">Библиотека</p><ul>
+<li><a href="../library/stdlib.html">Стандартная библиотека</a></li>
+<li><a href="../library/file-io.html">Работа с файлами</a></li>
+</ul>
+<p class="group">C++</p><ul>
+<li><a href="../cpp/differences.html">Отличия от C</a></li>
+<li><a href="../cpp/references.html">Ссылки</a></li>
+<li><a href="../cpp/namespaces.html">Пространства имён</a></li>
+<li><a href="../cpp/overloading.html">Перегрузка функций</a></li>
+<li><a href="../cpp/classes.html">Классы и объекты</a></li>
+<li><a href="../cpp/inheritance.html">Наследование</a></li>
+<li><a href="../cpp/operators.html">Перегрузка операторов</a></li>
+<li><a href="../cpp/templates.html">Шаблоны</a></li>
+<li><a href="../cpp/new-delete.html">new и delete</a></li>
+<li><a href="../cpp/exceptions.html">Исключения</a></li>
+<li><a href="../cpp/const-constexpr.html">const и constexpr</a></li>
+</ul>
+<p class="group">Алгоритмы</p><ul>
+<li><a href="../algorithms/complexity.html">Сложность (O-нотация)</a></li>
+<li><a href="../algorithms/search.html">Поиск</a></li>
+<li><a href="../algorithms/sorting.html">Сортировка</a></li>
+<li><a href="../algorithms/recursion.html">Рекурсия и НОД</a></li>
+<li><a href="../algorithms/primes.html">Простые числа</a></li>
+<li><a href="../algorithms/data-structures.html">Структуры данных</a></li>
+</ul>
+<p class="group">Микроконтроллеры</p><ul>
+<li><a href="../mcu/index.html" class="active" aria-current="page">Раздел (WIP)</a></li>
+</ul>
+<p class="group">Практика</p><ul>
+<li><a href="../examples/index.html">Примеры программ</a></li>
+<li><a href="../faq.html">FAQ и глоссарий</a></li>
+</ul>
+</nav>
+<main>
+<h1>Программирование микроконтроллеров</h1>
+<p class="lead">Раздел в разработке / WIP</p>
+<div class="note">
+<p>Здесь появится справочник по программированию микроконтроллеров на C и C++: от первых шагов
+с платой и периферией до типичных приёмов, которые нужны во встраиваемых проектах.
+Страницы ещё готовятся, поэтому из меню пока доступна только эта заглушка.</p>
+</div>
+
+<h2>Что планируется</h2>
+<ul>
+<li>Архитектура микроконтроллера: ядро, память, тактовая частота, карта регистров.</li>
+<li>GPIO: настройка выводов, вход и выход, подтяжки.</li>
+<li>Таймеры, задержки и измерение интервалов.</li>
+<li>Прерывания: вектор, приоритет, что можно делать в обработчике.</li>
+<li>Последовательные интерфейсы: UART, I<sup>2</sup>C, SPI.</li>
+<li>АЦП и работа с датчиками.</li>
+<li>Отладка на железе: полухост, вывод по USB CDC, логи.</li>
+</ul>
+
+<p>Пока можно опереться на уже готовые разделы по C: особенно
+<a href="../language/pointers.html">указатели</a>,
+<a href="../language/memory.html">память</a>,
+<a href="../language/structs-unions-enums.html">структуры и перечисления</a> и
+<a href="../language/preprocessor.html">препроцессор</a> — без них регистры и заголовочные файлы
+производителей читаются тяжело.</p>
+<div class="warn">Материалы этого раздела появятся позже и не заменяют документацию на конкретный чип
+и набор инструментов (STM32Cube, PlatformIO, vendor SDK и т. д.).</div>
+<nav class="pager" aria-label="Соседние страницы"><a class="prev" href="../algorithms/data-structures.html">← Структуры данных</a><a class="next" href="../examples/index.html">Примеры программ →</a></nav>
+</main>
+</div>
+<footer class="footer">
+<p>Справочник по языкам C и C++ — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+Подсветка: <a href="../assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="../assets/fonts/OFL.txt">OFL 1.1</a>).</p>
+</footer>
+<script src="../assets/js/prism.js"></script>
+</body>
+</html>

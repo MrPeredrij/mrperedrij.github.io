@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Шаблоны — Справочник по C</title>
+<meta name="description" content="Основы шаблонов C++: шаблоны функций и классов, инстанцирование и специализация. Без STL.">
+<link rel="preload" href="../assets/fonts/jetbrains-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="../index.html"><span class="logo">C</span> Справочник по C</a>
+<span class="std">C11 · C17 · C++17</span>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Разделы">
+<p class="group">Начало</p><ul>
+<li><a href="../index.html">Главная</a></li>
+<li><a href="../getting-started/install-and-compile.html">Установка и компиляция</a></li>
+</ul>
+<p class="group">Основы</p><ul>
+<li><a href="../basics/syntax.html">Синтаксис и операторы</a></li>
+<li><a href="../basics/types-and-variables.html">Типы и переменные</a></li>
+<li><a href="../basics/control-flow.html">Управление потоком</a></li>
+</ul>
+<p class="group">Язык</p><ul>
+<li><a href="../language/functions.html">Функции</a></li>
+<li><a href="../language/arrays-and-strings.html">Массивы и строки</a></li>
+<li><a href="../language/pointers.html">Указатели</a></li>
+<li><a href="../language/memory.html">Память</a></li>
+<li><a href="../language/structs-unions-enums.html">Структуры и enum</a></li>
+<li><a href="../language/preprocessor.html">Препроцессор</a></li>
+</ul>
+<p class="group">Библиотека</p><ul>
+<li><a href="../library/stdlib.html">Стандартная библиотека</a></li>
+<li><a href="../library/file-io.html">Работа с файлами</a></li>
+</ul>
+<p class="group">C++</p><ul>
+<li><a href="../cpp/differences.html">Отличия от C</a></li>
+<li><a href="../cpp/references.html">Ссылки</a></li>
+<li><a href="../cpp/namespaces.html">Пространства имён</a></li>
+<li><a href="../cpp/overloading.html">Перегрузка функций</a></li>
+<li><a href="../cpp/classes.html">Классы и объекты</a></li>
+<li><a href="../cpp/inheritance.html">Наследование</a></li>
+<li><a href="../cpp/operators.html">Перегрузка операторов</a></li>
+<li><a href="../cpp/templates.html" class="active" aria-current="page">Шаблоны</a></li>
+<li><a href="../cpp/new-delete.html">new и delete</a></li>
+<li><a href="../cpp/exceptions.html">Исключения</a></li>
+<li><a href="../cpp/const-constexpr.html">const и constexpr</a></li>
+</ul>
+<p class="group">Алгоритмы</p><ul>
+<li><a href="../algorithms/complexity.html">Сложность (O-нотация)</a></li>
+<li><a href="../algorithms/search.html">Поиск</a></li>
+<li><a href="../algorithms/sorting.html">Сортировка</a></li>
+<li><a href="../algorithms/recursion.html">Рекурсия и НОД</a></li>
+<li><a href="../algorithms/primes.html">Простые числа</a></li>
+<li><a href="../algorithms/data-structures.html">Структуры данных</a></li>
+</ul>
+<p class="group">Микроконтроллеры</p><ul>
+<li><a href="../mcu/index.html">Раздел (WIP)</a></li>
+</ul>
+<p class="group">Практика</p><ul>
+<li><a href="../examples/index.html">Примеры программ</a></li>
+<li><a href="../faq.html">FAQ и глоссарий</a></li>
+</ul>
+</nav>
+<main>
+<h1>Шаблоны</h1>
+<p><b>Шаблон</b> — заготовка функции или класса с параметрами-типами (и, при необходимости, значениями).
+Компилятор <i>инстанцирует</i> шаблон: подставляет конкретный тип и порождает обычный код.
+Один и тот же алгоритм можно применить к <code>int</code>, <code>double</code> и своему классу,
+если для типа определены нужные операции.</p>
+<p>В этом разделе контейнеры стандартной библиотеки не используются: цель — понять сам механизм шаблонов.</p>
+<figure class="code"><figcaption>C++</figcaption><pre><code class="language-cpp">#include &lt;cstdio&gt;
+
+template &lt;typename T&gt;
+T maximum(T a, T b)
+{
+    return a &gt; b ? a : b;
+}
+
+int main()
+{
+    std::printf("%d %.1f\n", maximum(3, 8), maximum(2.5, 2.1));
+    std::printf("%c\n", maximum('a', 'z'));
+    return 0;
+}</code></pre></figure>
+<h2>Шаблон класса</h2>
+<p>Параметр шаблона доступен внутри класса как обычный тип. Определение методов шаблона, как правило,
+оставляют в заголовке: компилятору нужно видеть тело в момент инстанцирования.</p>
+<figure class="code"><figcaption>C++</figcaption><pre><code class="language-cpp">#include &lt;cstdio&gt;
+
+template &lt;typename T, int N&gt;
+class Array {
+public:
+    Array()
+    {
+        for (int i = 0; i &lt; N; ++i)
+            data_[i] = T{};
+    }
+
+    T &amp;operator[](int i) { return data_[i]; }
+    const T &amp;operator[](int i) const { return data_[i]; }
+    static constexpr int size() { return N; }
+
+private:
+    T data_[N];
+};
+
+int main()
+{
+    Array&lt;int, 4&gt; a;
+    a[0] = 10;
+    a[1] = 20;
+    int sum = 0;
+    for (int i = 0; i &lt; a.size(); ++i)
+        sum += a[i];
+    std::printf("size = %d, sum = %d\n", a.size(), sum);
+    return 0;
+}</code></pre></figure>
+<h2>Что важно помнить</h2>
+<ul>
+<li>Ошибка в шаблоне часто всплывает в месте <i>использования</i>, а не в месте определения, и сообщения компилятора бывают длинными.</li>
+<li>Каждая комбинация параметров порождает свой код: <code>Array&lt;int, 4&gt;</code> и <code>Array&lt;int, 8&gt;</code> — разные типы.</li>
+<li>Можно явно указать аргументы: <code>maximum&lt;int&gt;(1, 2)</code>. Часто их выводят из аргументов вызова.</li>
+<li>Полная <b>специализация</b> задаёт отдельную реализацию для конкретного типа, если общее определение ему не подходит.</li>
+</ul>
+<figure class="code"><figcaption>C++</figcaption><pre><code class="language-cpp">#include &lt;cstdio&gt;
+#include &lt;cstring&gt;
+
+template &lt;typename T&gt;
+int compare(T a, T b)
+{
+    if (a &lt; b) return -1;
+    if (b &lt; a) return 1;
+    return 0;
+}
+
+template &lt;&gt;
+int compare&lt;const char *&gt;(const char *a, const char *b)
+{
+    return std::strcmp(a, b);
+}
+
+int main()
+{
+    std::printf("%d %d\n", compare(2, 5), compare("ab", "ab"));
+    return 0;
+}</code></pre></figure>
+<div class="note">Шаблоны — основа STL: <code>std::vector&lt;T&gt;</code> и <code>std::sort</code> устроены именно так.
+Отдельный раздел про STL появится позже.</div>
+<nav class="pager" aria-label="Соседние страницы"><a class="prev" href="../cpp/operators.html">← Перегрузка операторов</a><a class="next" href="../cpp/new-delete.html">new и delete →</a></nav>
+</main>
+</div>
+<footer class="footer">
+<p>Справочник по языкам C и C++ — учебный проект для лабораторной работы «Настройка CDN для статического веб-сайта».
+Подсветка: <a href="../assets/js/PRISM-LICENSE.txt">Prism (MIT)</a>. Шрифт: JetBrains Mono (<a href="../assets/fonts/OFL.txt">OFL 1.1</a>).</p>
+</footer>
+<script src="../assets/js/prism.js"></script>
+</body>
+</html>
